@@ -391,6 +391,14 @@
             justify-content: center;
             font-size: 2rem;
             transition: all 0.3s ease;
+            overflow: hidden;
+            padding: 0;
+        }
+        
+        .rabbi-toggle-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .rabbi-toggle-btn:hover {
@@ -435,6 +443,15 @@
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
+            overflow: hidden;
+            border: 2px solid var(--synagogue-gold);
+            box-shadow: 0 2px 10px rgba(184, 134, 11, 0.3);
+        }
+        
+        .rabbi-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .rabbi-info h3 {
@@ -3467,12 +3484,18 @@
          ═══════════════════════════════════════════════════════════════ -->
     <div class="rabbi-chat-container">
         <button class="rabbi-toggle-btn" id="rabbiToggleBtn" title="Talk to Rabbi Moshe">
-            👨‍🏫
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Menachem_Mendel_Schneerson2.jpg/100px-Menachem_Mendel_Schneerson2.jpg" 
+                 alt="Rabbi" 
+                 onerror="this.style.display='none'; this.parentElement.innerHTML='🕎';">
         </button>
         
         <div class="rabbi-chat-window" id="rabbiChatWindow">
             <div class="rabbi-header">
-                <div class="rabbi-avatar">👨‍🏫</div>
+                <div class="rabbi-avatar">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Menachem_Mendel_Schneerson2.jpg/100px-Menachem_Mendel_Schneerson2.jpg" 
+                         alt="Rabbi Moshe ben David" 
+                         onerror="this.style.display='none'; this.parentElement.innerHTML='🕎';">
+                </div>
                 <div class="rabbi-info">
                     <h3>Rabbi Moshe ben David</h3>
                     <p>Your Guide to Jewish Wisdom</p>
@@ -4306,32 +4329,4 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
                 rabbiSendBtn.addEventListener('click', sendRabbiMessage);
             }
             
-            // Input keypress
-            const rabbiInput = document.getElementById('rabbiInput');
-            if (rabbiInput) {
-                rabbiInput.addEventListener('keypress', function(event) {
-                    if (event.key === 'Enter' && !event.shiftKey) {
-                        event.preventDefault();
-                        sendRabbiMessage();
-                    }
-                });
-            }
-            
-            console.log('🔗 All event listeners attached');
-        }
         
-        // Run initialization when DOM is ready or immediately if already loaded
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initializeEventListeners);
-        } else {
-            // DOM already loaded, run immediately
-            initializeEventListeners();
-        }
-
-        console.log('✅ All AI features initialized');
-        console.log('🕎 Rabbi Moshe ben David is ready to assist');
-        console.log('🎯 Pathway quiz ready');
-    </script>
-
-</body>
-</html>
