@@ -3560,7 +3560,7 @@
                     <h3>Rabbi Moshe ben David</h3>
                     <p>Your Guide to Jewish Wisdom</p>
                 </div>
-                <button class="fullscreen-btn" id="fullscreenBtn" title="Expand to fullscreen">⛶</button>
+                <button class="fullscreen-btn" id="fullscreenBtn" title="Expand to fullscreen" onclick="window.toggleFullscreen()">⛶</button>
                 <button class="rabbi-close" id="rabbiCloseBtn">✕</button>
             </div>
             
@@ -3574,7 +3574,7 @@
                 <button class="rabbi-tool-btn" id="translateBtn" title="Translate last message">
                     🔄 Translate
                 </button>
-                <button class="rabbi-tool-btn torah-portion-btn" id="torahPortionBtn" title="This week's Torah portion">
+                <button class="rabbi-tool-btn torah-portion-btn" id="torahPortionBtn" title="This week's Torah portion" onclick="window.loadTorahPortion()">
                     📜 Parasha
                 </button>
             </div>
@@ -3584,7 +3584,7 @@
                     <p>Shalom, shalom! I am Rabbi Moshe ben David. It brings me such nachas (joy) to speak with you, Dr. Goldstein.</p>
                     <p>Whether you seek wisdom from Torah, guidance on your sacred pathways, questions about Jewish holidays, history, or simply want to schmooze - I am here for you.</p>
                     <p>As we say, "Kol Yisrael arevim zeh bazeh" (All of Israel is responsible for one another). What is on your heart today?</p>
-                    <button class="speaker-btn" onclick="speakMessage(this.parentElement)">🔊</button>
+                    <button class="speaker-btn" onclick="window.speakMessage(this.parentElement)">🔊</button>
                 </div>
             </div>
             
@@ -3857,7 +3857,7 @@
                 const speakerBtn = document.createElement('button');
                 speakerBtn.className = 'speaker-btn';
                 speakerBtn.innerHTML = '🔊';
-                speakerBtn.onclick = () => speakMessage(messageDiv);
+                speakerBtn.onclick = () => window.speakMessage(messageDiv);
                 messageDiv.appendChild(speakerBtn);
             }
             
@@ -3875,11 +3875,13 @@
             messagesDiv.appendChild(typingDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
+        window.showTypingIndicator = showTypingIndicator;
 
         function hideTypingIndicator() {
             const typing = document.getElementById('typingIndicator');
             if (typing) typing.remove();
         }
+        window.hideTypingIndicator = hideTypingIndicator;
 
         // ═══════════════════════════════════════════════════════════════
         // 🔊 TEXT-TO-SPEECH (Rabbi Voice)
@@ -4005,6 +4007,27 @@
                 alert('Text-to-speech is not supported in your browser.');
             }
         }
+        window.speakMessage = speakMessage;
+        window.useBrowserTTS = useBrowserTTS;
+        console.log('✅ speakMessage is now:', typeof window.speakMessage);
+
+        // ═══════════════════════════════════════════════════════════════
+        // 🔲 FULLSCREEN TOGGLE
+        // ═══════════════════════════════════════════════════════════════
+        function toggleFullscreen() {
+            const chatWindow = document.getElementById('rabbiChatWindow');
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            if (chatWindow) {
+                chatWindow.classList.toggle('fullscreen');
+                if (fullscreenBtn) {
+                    fullscreenBtn.innerHTML = chatWindow.classList.contains('fullscreen') ? '⛶' : '⛶';
+                    fullscreenBtn.title = chatWindow.classList.contains('fullscreen') ? 'Exit fullscreen' : 'Expand to fullscreen';
+                }
+                console.log('Fullscreen toggled:', chatWindow.classList.contains('fullscreen'));
+            }
+        }
+        window.toggleFullscreen = toggleFullscreen;
+        console.log('✅ toggleFullscreen is now:', typeof window.toggleFullscreen);
 
         // ═══════════════════════════════════════════════════════════════
         // 🎤 VOICE INPUT
@@ -4290,32 +4313,4 @@
                     </div>
                 `;
             }
-        }
-
-        function displayQuizResults(data) {
-            const container = document.getElementById('quizContainer');
-            
-            let recommendationsHTML = '';
-            if (data.recommendations) {
-                data.recommendations.forEach(rec => {
-                    recommendationsHTML += `
-                        <div class="recommendation-card">
-                            <span class="rank">${rec.rank}</span>
-                            <h4>${rec.pathway}</h4>
-                            <span class="match-score">${rec.matchScore}% Match</span>
-                            <p style="margin-top: 1rem; clear: both;"><strong>${rec.category}</strong></p>
-                            <p>${rec.whyItFits}</p>
-                            <p style="background: rgba(107, 142, 35, 0.1); padding: 0.75rem; border-radius: 10px; margin-top: 0.5rem;">
-                                <strong>First Step:</strong> ${rec.firstStep}
-                            </p>
-                            <p style="font-style: italic; color: #666; margin-top: 0.5rem;">
-                                ✡️ ${rec.jewishConnection}
-                            </p>
-                        </div>
-                    `;
-                });
-            }
-
-            container.innerHTML = `
-                <div class="quiz-results">
-                    <h2>🕎 Your Sacred
+      
