@@ -4928,12 +4928,15 @@
             if (!grid) { console.error('yiddishWordGrid not found'); return; }
             
             var words = window.getFilteredWords();
+            console.log('Rendering ' + words.length + ' Yiddish words');
             var html = '';
             
-            words.forEach(function(word, index) {
+            words.forEach(function(word) {
                 var isLearned = window.yiddishLearned.includes(word.transliteration);
+                var originalIndex = window.yiddishWords.indexOf(word);
                 html += '<div class="yiddish-word-tile' + (isLearned ? ' learned' : '') + '" ' +
-                    'onclick="window.handleTileClick(\'' + word.transliteration.replace(/'/g, "\\'") + '\')">' +
+                    'data-word="' + originalIndex + '" ' +
+                    'onclick="window.handleTileClickByIndex(' + originalIndex + ')">' +
                     '<span class="yiddish-tile-speaker">🔊</span>' +
                     (isLearned ? '<span class="yiddish-tile-check">✓</span>' : '') +
                     '<div class="yiddish-tile-word">' + word.word + '</div>' +
@@ -4942,6 +4945,16 @@
             });
             
             grid.innerHTML = html;
+            console.log('Grid updated with ' + words.length + ' tiles');
+        };
+        
+        window.handleTileClickByIndex = function(index) {
+            var word = window.yiddishWords[index];
+            if (!word) { console.error('Word not found at index', index); return; }
+            
+            window.currentYiddishWord = word;
+            window.speakYiddishWordQuick(word);
+            window.showYiddishDetail(word);
         };
         
         window.getFilteredWords = function() {
@@ -4970,20 +4983,24 @@
             var grid = document.getElementById('yiddishWordGrid');
             if (!grid) return;
             
-            var words = window.getFilteredWords();
             searchTerm = (searchTerm || '').toLowerCase();
             
-            var filtered = searchTerm ? words.filter(function(w) {
+            // Filter from ALL words, not just current category
+            var filtered = window.yiddishWords.filter(function(w) {
+                if (!searchTerm) return true;
                 return w.transliteration.toLowerCase().includes(searchTerm) ||
                        w.meaning.toLowerCase().includes(searchTerm) ||
                        w.word.includes(searchTerm);
-            }) : words;
+            });
+            
+            console.log('Search found ' + filtered.length + ' words');
             
             var html = '';
-            filtered.forEach(function(word) {
+            filtered.forEach(function(word, index) {
                 var isLearned = window.yiddishLearned.includes(word.transliteration);
+                var originalIndex = window.yiddishWords.indexOf(word);
                 html += '<div class="yiddish-word-tile' + (isLearned ? ' learned' : '') + '" ' +
-                    'onclick="window.handleTileClick(\'' + word.transliteration.replace(/'/g, "\\'") + '\')">' +
+                    'onclick="window.handleTileClickByIndex(' + originalIndex + ')">' +
                     '<span class="yiddish-tile-speaker">🔊</span>' +
                     (isLearned ? '<span class="yiddish-tile-check">✓</span>' : '') +
                     '<div class="yiddish-tile-word">' + word.word + '</div>' +
