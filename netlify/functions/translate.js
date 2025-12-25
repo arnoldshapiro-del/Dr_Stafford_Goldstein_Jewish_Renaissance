@@ -1,73 +1,82 @@
-// Hebrew/English Translation Function
-// Uses Gemini 2.5 Flash for accurate translation
+// Netlify Serverless Function - Hebrew/English Translation
+// Uses Gemini 2.5 Flash for accurate translation with Jewish context
 
 exports.handler = async (event, context) => {
   // CORS headers for all responses
-  const headers = {
+  const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
   };
 
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return { statusCode: 204, headers: corsHeaders, body: '' };
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return { 
+      statusCode: 405, 
+      headers: corsHeaders, 
+      body: JSON.stringify({ error: 'Method Not Allowed' }) 
+    };
+  }
+
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  
+  if (!GEMINI_API_KEY) {
+    return { 
+      statusCode: 500, 
+      headers: corsHeaders, 
+      body: JSON.stringify({ error: 'API key not configured' }) 
+    };
   }
 
   try {
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    const { text, direction = 'toEnglish' } = JSON.parse(event.body);
     
-    if (!GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY not set');
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'API key not configured' })
-      };
-    }
-
-    const { text, direction } = JSON.parse(event.body);
-    
-    if (!text) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Text is required' })
+    if (!text || typeof text !== 'string') {
+      return { 
+        statusCode: 400, 
+        headers: corsHeaders, 
+        body: JSON.stringify({ error: 'Text is required' }) 
       };
     }
 
     let prompt;
-    if (direction === 'toHebrew' || direction === 'en-to-he') {
-      prompt = `You are an expert Hebrew translator with deep knowledge of both modern and biblical Hebrew.
+    if (direction === 'toHebrew') {
+      prompt = `You are an expert Hebrew translator with deep knowledge of both modern and biblical Hebrew, as well as Jewish religious terminology.
 
-Translate the following English text to Hebrew. Provide both the Hebrew text and a transliteration for pronunciation.
+Translate the following English text to Hebrew.
+- Use modern Hebrew but preserve religious/Jewish terminology appropriately
+- Maintain the tone and feeling of the original
+- For religious terms, use standard Hebrew equivalents
 
-Text to translate: "${text}"
-
-Format your response as JSON:
+Respond with JSON:
 {
   "hebrew": "Hebrew text in Hebrew characters",
   "transliteration": "Hebrew pronunciation in English letters",
   "original": "original English text"
-}`;
+}
+
+Text to translate: "${text}"`;
     } else {
-      prompt = `You are an expert Hebrew-to-English translator with deep knowledge of Jewish texts and culture.
+      prompt = `You are an expert Hebrew-to-English translator with deep knowledge of Jewish texts, culture, and terminology.
 
-Translate the following Hebrew text to English. If the input is already transliterated Hebrew, translate it to English.
+Translate the following Hebrew text to English.
+- Preserve the meaning and nuance of the original
+- Keep Hebrew terms commonly used in Jewish contexts (like "shalom", "mitzvah", "chesed") with translations in parentheses if needed
+- If the input is transliterated Hebrew, translate it to English
 
-Text to translate: "${text}"
-
-Format your response as JSON:
+Respond with JSON:
 {
   "english": "English translation",
   "original": "original text",
-  "notes": "any relevant notes about the translation or cultural context (optional)"
-}`;
+  "notes": "any relevant notes about translation or cultural context (optional, can be null)"
+}
+
+Text to translate: "${text}"`;
     }
 
     // Call Gemini 2.5 Flash API
@@ -80,7 +89,7 @@ Format your response as JSON:
           contents: [{ role: 'user', parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.3,
-            maxOutputTokens: 512
+            maxOutputTokens: 1024
           }
         })
       }
@@ -88,18 +97,9 @@ Format your response as JSON:
 
     const data = await response.json();
     
-    console.log('Gemini API response status:', response.status);
-    
     if (!response.ok) {
       console.error('Gemini API error:', JSON.stringify(data));
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ 
-          error: 'API error', 
-          details: data.error?.message || 'Unknown error'
-        })
-      };
+      throw new Error(data.error?.message || 'Translation failed');
     }
 
     let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -116,18 +116,19 @@ Format your response as JSON:
 
     return {
       statusCode: 200,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({
         direction: direction,
-        result: result
+        result: result,
+        model: 'gemini-2.5-flash'
       })
     };
 
   } catch (error) {
-    console.error('Function error:', error);
+    console.error('Translation error:', error);
     return {
       statusCode: 500,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({ error: error.message })
     };
   }
