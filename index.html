@@ -3610,16 +3610,30 @@
         window.toggleRabbiChat = function() {
             console.log('🕎 toggleRabbiChat CALLED!');
             var chatWindow = document.getElementById('rabbiChatWindow');
+            console.log('🔍 Chat window element:', chatWindow);
             if (!chatWindow) {
                 console.error('❌ Chat window not found!');
                 alert('Chat window not found!');
                 return;
             }
+            console.log('📊 Current classes:', chatWindow.className);
+            console.log('📊 Current display style:', window.getComputedStyle(chatWindow).display);
+            
             chatWindow.classList.toggle('open');
+            
+            console.log('📊 After toggle classes:', chatWindow.className);
+            console.log('📊 After toggle display:', window.getComputedStyle(chatWindow).display);
             console.log('Chat window open state:', chatWindow.classList.contains('open'));
+            
+            // FORCE display as backup
             if (chatWindow.classList.contains('open')) {
+                chatWindow.style.display = 'flex';
+                chatWindow.style.zIndex = '999999';
+                console.log('✅ FORCED display:flex and z-index');
                 var input = document.getElementById('rabbiInput');
                 if (input) input.focus();
+            } else {
+                chatWindow.style.display = 'none';
             }
         };
         
