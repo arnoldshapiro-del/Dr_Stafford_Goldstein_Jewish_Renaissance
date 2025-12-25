@@ -491,14 +491,15 @@
             border-radius: 0 !important;
             z-index: 100000 !important;
             background: linear-gradient(180deg, 
-                rgba(10, 22, 40, 0.98) 0%, 
-                rgba(26, 47, 78, 0.98) 50%,
-                rgba(10, 22, 40, 0.98) 100%) !important;
+                #0a1628 0%, 
+                #1a2f4e 50%,
+                #0a1628 100%) !important;
         }
         
         .rabbi-chat-window.fullscreen .rabbi-header {
             padding: 1.5rem 2rem;
-            background: linear-gradient(135deg, rgba(15, 82, 186, 0.4) 0%, rgba(8, 37, 103, 0.4) 100%);
+            background: linear-gradient(135deg, rgba(15, 82, 186, 0.6) 0%, rgba(8, 37, 103, 0.6) 100%);
+            border-bottom: 2px solid var(--synagogue-gold);
         }
         
         .rabbi-chat-window.fullscreen .rabbi-avatar {
@@ -510,30 +511,77 @@
         
         .rabbi-chat-window.fullscreen .rabbi-info h3 {
             font-size: 1.8rem;
+            color: #ffffff !important;
+        }
+        
+        .rabbi-chat-window.fullscreen .rabbi-info p {
+            color: #d4af37 !important;
         }
         
         .rabbi-chat-window.fullscreen .rabbi-messages {
-            padding: 2rem;
-            max-width: 900px;
+            padding: 2rem 3rem;
+            max-width: 1000px;
             margin: 0 auto;
+            background: transparent;
         }
         
         .rabbi-chat-window.fullscreen .rabbi-message {
-            font-size: 1.15rem;
-            line-height: 1.8;
-            padding: 1.5rem;
+            font-size: 1.2rem;
+            line-height: 1.9;
+            padding: 2rem;
             max-width: 100%;
+            border-radius: 20px;
         }
         
         .rabbi-chat-window.fullscreen .rabbi-message.rabbi {
-            background: linear-gradient(135deg, rgba(15, 82, 186, 0.3) 0%, rgba(8, 37, 103, 0.3) 100%);
-            border: 1px solid rgba(184, 134, 11, 0.4);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(245, 245, 250, 0.95) 100%) !important;
+            color: #1a1a2e !important;
+            border: 2px solid var(--synagogue-gold);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3), 0 0 30px rgba(184, 134, 11, 0.2);
+        }
+        
+        .rabbi-chat-window.fullscreen .rabbi-message.rabbi p {
+            color: #1a1a2e !important;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .rabbi-chat-window.fullscreen .rabbi-message.rabbi strong {
+            color: #0F52BA !important;
+            font-weight: 700;
+        }
+        
+        .rabbi-chat-window.fullscreen .rabbi-message.rabbi em {
+            color: #8B4513 !important;
+        }
+        
+        .rabbi-chat-window.fullscreen .rabbi-message.user {
+            background: linear-gradient(135deg, rgba(15, 82, 186, 0.9) 0%, rgba(8, 37, 103, 0.9) 100%) !important;
+            color: #ffffff !important;
+        }
+        
+        .rabbi-chat-window.fullscreen .rabbi-message .speaker-btn {
+            background: var(--synagogue-gold) !important;
+            color: #1a1a2e !important;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.3rem;
+            border-radius: 25px;
+            margin-top: 1rem;
+            opacity: 1 !important;
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+        }
+        
+        .rabbi-chat-window.fullscreen .rabbi-message .speaker-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(184, 134, 11, 0.6);
         }
         
         .rabbi-chat-window.fullscreen .rabbi-input-area {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             padding: 1.5rem 2rem;
+            background: rgba(10, 22, 40, 0.8);
+            border-top: 2px solid var(--synagogue-gold);
         }
         
         @keyframes avatarGlow {
@@ -619,17 +667,28 @@
         }
 
         .rabbi-message .speaker-btn {
-            position: absolute;
-            bottom: 5px;
-            right: 10px;
-            background: none;
+            display: inline-block;
+            margin-top: 0.75rem;
+            padding: 0.5rem 1rem;
+            background: linear-gradient(135deg, var(--synagogue-gold) 0%, #d4a824 100%);
             border: none;
+            border-radius: 20px;
             cursor: pointer;
-            opacity: 0.6;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            color: #1a1a2e;
+            box-shadow: 0 2px 8px rgba(184, 134, 11, 0.3);
+            transition: all 0.3s ease;
         }
 
-        .rabbi-message .speaker-btn:hover { opacity: 1; }
+        .rabbi-message .speaker-btn:hover { 
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.5);
+        }
+        
+        .rabbi-message .speaker-btn:disabled {
+            opacity: 0.7;
+            cursor: wait;
+        }
 
         .rabbi-input-area {
             padding: 1rem;
@@ -3408,7 +3467,7 @@
          ═══════════════════════════════════════════════════════════════ -->
     <div class="rabbi-chat-container">
         <button class="rabbi-toggle-btn" id="rabbiToggleBtn" title="Talk to Rabbi Moshe">
-            🕎
+            👨‍🏫
         </button>
         
         <div class="rabbi-chat-window" id="rabbiChatWindow">
@@ -3641,47 +3700,53 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        text: text.substring(0, 1000), // Limit text length
+                        text: text.substring(0, 800), // Limit text length
                         language: currentLanguageMode
                     })
                 });
 
                 const data = await response.json();
                 
-                if (data.audio) {
-                    // Play audio from base64 - handle various formats
-                    try {
-                        const audioData = atob(data.audio);
-                        const audioArray = new Uint8Array(audioData.length);
-                        for (let i = 0; i < audioData.length; i++) {
-                            audioArray[i] = audioData.charCodeAt(i);
-                        }
-                        const mimeType = data.mimeType || 'audio/wav';
-                        const audioBlob = new Blob([audioArray], { type: mimeType });
-                        const audioUrl = URL.createObjectURL(audioBlob);
-                        const audio = new Audio(audioUrl);
-                        
-                        audio.onended = () => {
-                            speakerBtn.innerHTML = '🔊';
-                            speakerBtn.disabled = false;
-                            URL.revokeObjectURL(audioUrl);
-                        };
-                        
-                        audio.onerror = () => {
-                            console.log('Audio playback failed, using browser TTS');
-                            useBrowserTTS(text, speakerBtn);
-                        };
-                        
-                        await audio.play();
-                    } catch (playError) {
-                        console.log('Audio processing failed:', playError);
-                        useBrowserTTS(text, speakerBtn);
+                // Check if we should use fallback
+                if (data.fallback || data.error || !data.audio) {
+                    console.log('TTS returned fallback signal, using browser TTS');
+                    useBrowserTTS(text, speakerBtn);
+                    return;
+                }
+                
+                // Play audio from base64
+                try {
+                    const audioData = atob(data.audio);
+                    const audioArray = new Uint8Array(audioData.length);
+                    for (let i = 0; i < audioData.length; i++) {
+                        audioArray[i] = audioData.charCodeAt(i);
                     }
-                } else {
-                    throw new Error('No audio data received');
+                    const mimeType = data.mimeType || 'audio/wav';
+                    console.log('Playing audio with mimeType:', mimeType);
+                    
+                    const audioBlob = new Blob([audioArray], { type: mimeType });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio(audioUrl);
+                    
+                    audio.onended = () => {
+                        speakerBtn.innerHTML = '🔊';
+                        speakerBtn.disabled = false;
+                        URL.revokeObjectURL(audioUrl);
+                    };
+                    
+                    audio.onerror = (e) => {
+                        console.log('Audio playback error:', e);
+                        URL.revokeObjectURL(audioUrl);
+                        useBrowserTTS(text, speakerBtn);
+                    };
+                    
+                    await audio.play();
+                } catch (playError) {
+                    console.log('Audio processing failed:', playError);
+                    useBrowserTTS(text, speakerBtn);
                 }
             } catch (error) {
-                console.log('TTS API error, using browser fallback:', error);
+                console.log('TTS fetch error:', error);
                 useBrowserTTS(text, speakerBtn);
             }
         }
@@ -3693,15 +3758,25 @@
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
                 utterance.rate = 0.85;
-                utterance.pitch = 0.95;
+                utterance.pitch = 0.9;
                 
-                // Try to find a good male voice
+                // Try to find a good voice
                 const voices = speechSynthesis.getVoices();
-                const preferredVoice = voices.find(v => 
-                    (currentLanguageMode === 'he' && v.lang.includes('he')) ||
-                    (currentLanguageMode === 'en' && (v.name.includes('Daniel') || v.name.includes('David') || v.name.includes('Male')))
-                );
-                if (preferredVoice) utterance.voice = preferredVoice;
+                if (voices.length === 0) {
+                    // Voices not loaded yet, wait and try again
+                    speechSynthesis.onvoiceschanged = () => {
+                        const newVoices = speechSynthesis.getVoices();
+                        const preferredVoice = newVoices.find(v => 
+                            v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'))
+                        ) || newVoices.find(v => v.lang.startsWith('en'));
+                        if (preferredVoice) utterance.voice = preferredVoice;
+                    };
+                } else {
+                    const preferredVoice = voices.find(v => 
+                        v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'))
+                    ) || voices.find(v => v.lang.startsWith('en'));
+                    if (preferredVoice) utterance.voice = preferredVoice;
+                }
                 
                 utterance.onend = () => {
                     speakerBtn.innerHTML = '🔊';
@@ -4311,79 +4386,4 @@ Please provide a rich, meaningful teaching as if delivering a Shabbat sermon.`
 
         // ═══════════════════════════════════════════════════════════════
         // 🔗 EVENT LISTENERS - Bind all buttons after DOM loads
-        // ═══════════════════════════════════════════════════════════════
-        document.addEventListener('DOMContentLoaded', function() {
-            // Rabbi toggle buttons
-            const rabbiToggleBtn = document.getElementById('rabbiToggleBtn');
-            if (rabbiToggleBtn) {
-                rabbiToggleBtn.addEventListener('click', toggleRabbiChat);
-            }
-            
-            const rabbiCloseBtn = document.getElementById('rabbiCloseBtn');
-            if (rabbiCloseBtn) {
-                rabbiCloseBtn.addEventListener('click', toggleRabbiChat);
-            }
-            
-            // Fullscreen button
-            const fullscreenBtn = document.getElementById('fullscreenBtn');
-            if (fullscreenBtn) {
-                fullscreenBtn.addEventListener('click', toggleRabbiFullscreen);
-            }
-            
-            // Language buttons
-            const langEnBtn = document.getElementById('langEnBtn');
-            if (langEnBtn) {
-                langEnBtn.addEventListener('click', function() { setLanguageMode('en'); });
-            }
-            
-            const langHeBtn = document.getElementById('langHeBtn');
-            if (langHeBtn) {
-                langHeBtn.addEventListener('click', function() { setLanguageMode('he'); });
-            }
-            
-            // Translate button
-            const translateBtn = document.getElementById('translateBtn');
-            if (translateBtn) {
-                translateBtn.addEventListener('click', translateLastMessage);
-            }
-            
-            // Torah Portion button
-            const torahPortionBtn = document.getElementById('torahPortionBtn');
-            if (torahPortionBtn) {
-                torahPortionBtn.addEventListener('click', loadTorahPortion);
-            }
-            
-            // Voice input button
-            const voiceInputBtn = document.getElementById('voiceInputBtn');
-            if (voiceInputBtn) {
-                voiceInputBtn.addEventListener('click', toggleVoiceInput);
-            }
-            
-            // Send button
-            const rabbiSendBtn = document.getElementById('rabbiSendBtn');
-            if (rabbiSendBtn) {
-                rabbiSendBtn.addEventListener('click', sendRabbiMessage);
-            }
-            
-            // Input keypress
-            const rabbiInput = document.getElementById('rabbiInput');
-            if (rabbiInput) {
-                rabbiInput.addEventListener('keypress', function(event) {
-                    if (event.key === 'Enter' && !event.shiftKey) {
-                        event.preventDefault();
-                        sendRabbiMessage();
-                    }
-                });
-            }
-            
-            console.log('🔗 All event listeners attached');
-        });
-
-        console.log('✅ All AI features initialized');
-        console.log('🕎 Rabbi Moshe ben David is ready to assist');
-        console.log('📿 Daily inspiration loaded');
-        console.log('🎯 Pathway quiz ready');
-    </script>
-
-</body>
-</html>
+        // ═══════════════════════════════════════
