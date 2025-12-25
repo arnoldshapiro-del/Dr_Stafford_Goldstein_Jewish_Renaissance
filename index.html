@@ -4090,13 +4090,24 @@
             input.value = '';
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             
-            // Show typing indicator
-            var typingDiv = document.createElement('div');
-            typingDiv.className = 'rabbi-typing';
-            typingDiv.id = 'typingIndicator';
-            typingDiv.innerHTML = '<span></span><span></span><span></span>';
-            messagesDiv.appendChild(typingDiv);
+            // Show enhanced loading spinner with stop button
+            var loadingDiv = document.createElement('div');
+            loadingDiv.className = 'rabbi-loading-container';
+            loadingDiv.id = 'rabbiLoadingIndicator';
+            loadingDiv.innerHTML = '<div class="rabbi-loading-spinner"><div class="rabbi-spinner"></div><span class="rabbi-loading-text">Rabbi Moshe is thinking...</span></div><button class="rabbi-stop-btn" onclick="window.stopRabbiGeneration()">⏹️ Stop</button>';
+            messagesDiv.appendChild(loadingDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            // Create abort controller
+            window.rabbiAbortController = new AbortController();
+            
+            // Get response mode for prompt modification
+            var modeInstructions = '';
+            if (window.rabbiResponseMode === 'quick') {
+                modeInstructions = ' Please give a brief 1-2 paragraph response.';
+            } else if (window.rabbiResponseMode === 'deep') {
+                modeInstructions = ' Please give a comprehensive, scholarly response with multiple sources and deep analysis (5-7 paragraphs).';
+            }
             
             try {
                 console.log('🌐 Calling rabbi API...');
@@ -4104,19 +4115,21 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        text: message,
-                        message: message,
-                        conversationHistory: window.rabbiConversationHistory
-                    })
+                        text: message + modeInstructions,
+                        message: message + modeInstructions,
+                        conversationHistory: window.rabbiConversationHistory,
+                        responseMode: window.rabbiResponseMode
+                    }),
+                    signal: window.rabbiAbortController.signal
                 });
                 
                 console.log('📡 API response status:', response.status);
                 var data = await response.json();
                 console.log('📦 API data:', data);
                 
-                // Remove typing indicator
-                var typing = document.getElementById('typingIndicator');
-                if (typing) typing.remove();
+                // Remove loading indicator
+                var loading = document.getElementById('rabbiLoadingIndicator');
+                if (loading) loading.remove();
                 
                 // Add rabbi response
                 var rabbiDiv = document.createElement('div');
@@ -4124,14 +4137,11 @@
                 var responseText = data.response || data.error || 'I apologize, something went wrong.';
                 rabbiDiv.innerHTML = '<p>' + responseText.replace(/\n/g, '<br>') + '</p>';
                 
-                // Add speaker button
-                var speakerBtn = document.createElement('button');
-                speakerBtn.className = 'speaker-btn';
-                speakerBtn.innerHTML = '🔊';
-                speakerBtn.onclick = function() {
-                    if (window.speakMessage) window.speakMessage(rabbiDiv);
-                };
-                rabbiDiv.appendChild(speakerBtn);
+                // Add action buttons
+                var actionsDiv = document.createElement('div');
+                actionsDiv.className = 'rabbi-message-actions';
+                actionsDiv.innerHTML = '<button class="speaker-btn" onclick="window.speakMessage(this.closest(\'.rabbi-message\'))">🔊 Listen</button><button class="rabbi-action-btn" onclick="window.copyMessage(this)">📋 Copy</button><button class="rabbi-action-btn" onclick="window.saveTeaching(this)">💾 Save</button>';
+                rabbiDiv.appendChild(actionsDiv);
                 
                 messagesDiv.appendChild(rabbiDiv);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -4141,15 +4151,23 @@
                 window.rabbiConversationHistory.push({ role: 'assistant', content: responseText });
                 
             } catch (error) {
-                console.error('❌ Rabbi API error:', error);
-                var typing = document.getElementById('typingIndicator');
-                if (typing) typing.remove();
+                if (error.name === 'AbortError') {
+                    console.log('🛑 Request aborted by user');
+                } else {
+                    console.error('❌ Rabbi API error:', error);
+                }
+                var loading = document.getElementById('rabbiLoadingIndicator');
+                if (loading) loading.remove();
                 
-                var errorDiv = document.createElement('div');
-                errorDiv.className = 'rabbi-message rabbi';
-                errorDiv.innerHTML = '<p>I apologize, but I am having trouble connecting. Please try again.</p>';
-                messagesDiv.appendChild(errorDiv);
+                if (error.name !== 'AbortError') {
+                    var errorDiv = document.createElement('div');
+                    errorDiv.className = 'rabbi-message rabbi';
+                    errorDiv.innerHTML = '<p>I apologize, but I am having trouble connecting. Please try again.</p>';
+                    messagesDiv.appendChild(errorDiv);
+                }
             }
+            
+            window.rabbiAbortController = null;
         };
         
         console.log('✅ toggleRabbiChat is now:', typeof window.toggleRabbiChat);
@@ -4456,12 +4474,44 @@
             const chatWindow = document.getElementById('rabbiChatWindow');
             const fullscreenBtn = document.getElementById('fullscreenBtn');
             if (chatWindow) {
-                chatWindow.classList.toggle('fullscreen');
+                const isFullscreen = chatWindow.classList.contains('fullscreen');
+                
+                if (!isFullscreen) {
+                    // Going fullscreen - force all styles
+                    chatWindow.classList.add('fullscreen');
+                    chatWindow.style.setProperty('position', 'fixed', 'important');
+                    chatWindow.style.setProperty('top', '0', 'important');
+                    chatWindow.style.setProperty('left', '0', 'important');
+                    chatWindow.style.setProperty('right', '0', 'important');
+                    chatWindow.style.setProperty('bottom', '0', 'important');
+                    chatWindow.style.setProperty('width', '100vw', 'important');
+                    chatWindow.style.setProperty('height', '100vh', 'important');
+                    chatWindow.style.setProperty('max-width', '100vw', 'important');
+                    chatWindow.style.setProperty('max-height', '100vh', 'important');
+                    chatWindow.style.setProperty('border-radius', '0', 'important');
+                    chatWindow.style.setProperty('z-index', '100000', 'important');
+                    console.log('✅ Fullscreen ENABLED with forced styles');
+                } else {
+                    // Exiting fullscreen - reset to normal
+                    chatWindow.classList.remove('fullscreen');
+                    chatWindow.style.setProperty('position', 'fixed', 'important');
+                    chatWindow.style.setProperty('top', '', '');
+                    chatWindow.style.setProperty('left', '', '');
+                    chatWindow.style.setProperty('right', '20px', 'important');
+                    chatWindow.style.setProperty('bottom', '100px', 'important');
+                    chatWindow.style.setProperty('width', '420px', 'important');
+                    chatWindow.style.setProperty('height', '600px', 'important');
+                    chatWindow.style.setProperty('max-width', 'calc(100vw - 40px)', 'important');
+                    chatWindow.style.setProperty('max-height', 'calc(100vh - 140px)', 'important');
+                    chatWindow.style.setProperty('border-radius', '25px', 'important');
+                    chatWindow.style.setProperty('z-index', '999999', 'important');
+                    console.log('✅ Fullscreen DISABLED, reset to normal');
+                }
+                
                 if (fullscreenBtn) {
                     fullscreenBtn.innerHTML = chatWindow.classList.contains('fullscreen') ? '⛶' : '⛶';
                     fullscreenBtn.title = chatWindow.classList.contains('fullscreen') ? 'Exit fullscreen' : 'Expand to fullscreen';
                 }
-                console.log('Fullscreen toggled:', chatWindow.classList.contains('fullscreen'));
             }
         }
         window.toggleFullscreen = toggleFullscreen;
