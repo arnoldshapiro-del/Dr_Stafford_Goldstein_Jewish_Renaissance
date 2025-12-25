@@ -1311,76 +1311,70 @@
             cursor: pointer;
         }
         
-        /* Word Grid - Compact Tappable Tiles */
-        .yiddish-word-grid {
+        /* Word List - Simple Scrollable */
+        .yiddish-word-list {
             flex: 1;
             overflow-y: auto;
-            padding: 12px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-            gap: 10px;
-            align-content: start;
+            padding: 10px;
+            background: #FEFDF8;
         }
         
-        .yiddish-word-tile {
+        .yiddish-word-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
             background: white;
             border: 2px solid rgba(184, 134, 11, 0.2);
-            border-radius: 12px;
-            padding: 12px 10px;
-            text-align: center;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.2s;
-            position: relative;
         }
         
-        .yiddish-word-tile:hover {
+        .yiddish-word-row:hover {
             border-color: #B8860B;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.2);
+            background: rgba(184, 134, 11, 0.05);
+            transform: translateX(5px);
         }
         
-        .yiddish-word-tile:active {
-            transform: scale(0.98);
-        }
-        
-        .yiddish-word-tile.learned {
+        .yiddish-word-row.learned {
             background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
             border-color: #28a745;
         }
         
-        .yiddish-word-tile.speaking {
-            border-color: #B8860B;
-            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.3);
+        .yiddish-row-num {
+            width: 35px;
+            font-size: 0.8rem;
+            color: #999;
+            font-weight: bold;
         }
         
-        .yiddish-tile-word {
+        .yiddish-row-hebrew {
+            width: 80px;
             font-size: 1.3rem;
             font-weight: bold;
             color: #1a365d;
-            margin-bottom: 4px;
+            text-align: center;
             direction: rtl;
         }
         
-        .yiddish-tile-translit {
-            font-size: 0.85rem;
+        .yiddish-row-translit {
+            flex: 1;
+            font-size: 1.1rem;
             color: #B8860B;
-            font-weight: 500;
+            font-weight: 600;
+            padding: 0 15px;
         }
         
-        .yiddish-tile-speaker {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            font-size: 0.9rem;
-            opacity: 0.6;
+        .yiddish-row-meaning {
+            flex: 2;
+            font-size: 0.95rem;
+            color: #555;
         }
         
-        .yiddish-tile-check {
-            position: absolute;
-            top: 6px;
-            left: 6px;
-            font-size: 0.8rem;
-            color: #28a745;
+        .yiddish-row-speaker {
+            font-size: 1.2rem;
+            padding: 0 10px;
         }
         
         /* Detail Overlay */
@@ -4507,10 +4501,10 @@
                 </div>
             </div>
             
-            <!-- Yiddish Learning Panel - Professional Language Learning Interface -->
+            <!-- Yiddish Learning Panel - Simple Scrollable List -->
             <div class="yiddish-panel" id="yiddishPanel">
                 <div class="yiddish-header">
-                    <h3>🗣️ Learn Yiddish</h3>
+                    <h3>🗣️ Learn Yiddish - 200 Words</h3>
                     <div class="yiddish-header-controls">
                         <span id="yiddishLearnedCount">0/200 learned</span>
                         <button onclick="window.closeYiddishPanel()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">✕</button>
@@ -4522,20 +4516,6 @@
                     <input type="text" id="yiddishSearch" placeholder="🔍 Search words..." oninput="window.filterYiddishWords(this.value)">
                 </div>
                 
-                <!-- Category Tabs -->
-                <div class="yiddish-tabs" id="yiddishTabs">
-                    <button class="yiddish-tab active" data-category="all" onclick="window.filterByCategory('all')">All (200)</button>
-                    <button class="yiddish-tab" data-category="greetings" onclick="window.filterByCategory('greetings')">👋 Greetings</button>
-                    <button class="yiddish-tab" data-category="food" onclick="window.filterByCategory('food')">🍲 Food</button>
-                    <button class="yiddish-tab" data-category="family" onclick="window.filterByCategory('family')">👨‍👩‍👧 Family</button>
-                    <button class="yiddish-tab" data-category="religious" onclick="window.filterByCategory('religious')">✡️ Religious</button>
-                    <button class="yiddish-tab" data-category="expressions" onclick="window.filterByCategory('expressions')">💬 Expressions</button>
-                    <button class="yiddish-tab" data-category="character" onclick="window.filterByCategory('character')">😊 Character</button>
-                    <button class="yiddish-tab" data-category="holidays" onclick="window.filterByCategory('holidays')">🕎 Holidays</button>
-                    <button class="yiddish-tab" data-category="wisdom" onclick="window.filterByCategory('wisdom')">📚 Wisdom</button>
-                    <button class="yiddish-tab" data-category="everyday" onclick="window.filterByCategory('everyday')">🏠 Everyday</button>
-                </div>
-                
                 <!-- Speed Control -->
                 <div class="yiddish-global-controls">
                     <span>Speech Speed:</span>
@@ -4544,9 +4524,9 @@
                     <button class="yiddish-stop-all-btn" onclick="window.stopAllYiddishSpeech()">⏹️ Stop</button>
                 </div>
                 
-                <!-- Word Grid -->
-                <div class="yiddish-word-grid" id="yiddishWordGrid">
-                    <!-- Words will be populated here -->
+                <!-- Simple Scrollable Word List -->
+                <div class="yiddish-word-list" id="yiddishWordList">
+                    <!-- Words will be populated here as a simple list -->
                 </div>
                 
                 <!-- Expanded Word Detail (hidden by default) -->
@@ -4904,7 +4884,7 @@
         window.openCourse = function(course) {
             if (course === 'yiddish') {
                 document.getElementById('yiddishPanel').classList.add('open');
-                window.renderYiddishGrid();
+                window.renderYiddishList();
                 window.updateLearnedCount();
             } else if (course === 'parsha') {
                 window.loadTorahPortion();
@@ -4923,34 +4903,29 @@
             if (el) el.textContent = window.yiddishLearned.length + '/200 learned';
         };
         
-        window.renderYiddishGrid = function() {
-            var grid = document.getElementById('yiddishWordGrid');
-            if (!grid) { console.error('yiddishWordGrid not found'); return; }
+        window.renderYiddishList = function() {
+            var list = document.getElementById('yiddishWordList');
+            if (!list) { console.error('yiddishWordList not found'); return; }
             
-            var words = window.getFilteredWords();
-            console.log('Rendering ' + words.length + ' Yiddish words');
             var html = '';
-            
-            words.forEach(function(word) {
+            window.yiddishWords.forEach(function(word, index) {
                 var isLearned = window.yiddishLearned.includes(word.transliteration);
-                var originalIndex = window.yiddishWords.indexOf(word);
-                html += '<div class="yiddish-word-tile' + (isLearned ? ' learned' : '') + '" ' +
-                    'data-word="' + originalIndex + '" ' +
-                    'onclick="window.handleTileClickByIndex(' + originalIndex + ')">' +
-                    '<span class="yiddish-tile-speaker">🔊</span>' +
-                    (isLearned ? '<span class="yiddish-tile-check">✓</span>' : '') +
-                    '<div class="yiddish-tile-word">' + word.word + '</div>' +
-                    '<div class="yiddish-tile-translit">' + word.transliteration + '</div>' +
+                html += '<div class="yiddish-word-row' + (isLearned ? ' learned' : '') + '" onclick="window.handleWordClick(' + index + ')">' +
+                    '<span class="yiddish-row-num">' + (index + 1) + '.</span>' +
+                    '<span class="yiddish-row-hebrew">' + word.word + '</span>' +
+                    '<span class="yiddish-row-translit">' + word.transliteration + '</span>' +
+                    '<span class="yiddish-row-meaning">' + word.meaning + '</span>' +
+                    '<span class="yiddish-row-speaker">🔊</span>' +
                 '</div>';
             });
             
-            grid.innerHTML = html;
-            console.log('Grid updated with ' + words.length + ' tiles');
+            list.innerHTML = html;
+            console.log('Rendered ' + window.yiddishWords.length + ' words in list');
         };
         
-        window.handleTileClickByIndex = function(index) {
+        window.handleWordClick = function(index) {
             var word = window.yiddishWords[index];
-            if (!word) { console.error('Word not found at index', index); return; }
+            if (!word) return;
             
             window.currentYiddishWord = word;
             window.speakYiddishWordQuick(word);
@@ -4980,35 +4955,34 @@
         };
         
         window.filterYiddishWords = function(searchTerm) {
-            var grid = document.getElementById('yiddishWordGrid');
-            if (!grid) return;
+            var list = document.getElementById('yiddishWordList');
+            if (!list) return;
             
-            searchTerm = (searchTerm || '').toLowerCase();
-            
-            // Filter from ALL words, not just current category
-            var filtered = window.yiddishWords.filter(function(w) {
-                if (!searchTerm) return true;
-                return w.transliteration.toLowerCase().includes(searchTerm) ||
-                       w.meaning.toLowerCase().includes(searchTerm) ||
-                       w.word.includes(searchTerm);
-            });
-            
-            console.log('Search found ' + filtered.length + ' words');
+            searchTerm = (searchTerm || '').toLowerCase().trim();
             
             var html = '';
-            filtered.forEach(function(word, index) {
-                var isLearned = window.yiddishLearned.includes(word.transliteration);
-                var originalIndex = window.yiddishWords.indexOf(word);
-                html += '<div class="yiddish-word-tile' + (isLearned ? ' learned' : '') + '" ' +
-                    'onclick="window.handleTileClickByIndex(' + originalIndex + ')">' +
-                    '<span class="yiddish-tile-speaker">🔊</span>' +
-                    (isLearned ? '<span class="yiddish-tile-check">✓</span>' : '') +
-                    '<div class="yiddish-tile-word">' + word.word + '</div>' +
-                    '<div class="yiddish-tile-translit">' + word.transliteration + '</div>' +
-                '</div>';
+            var count = 0;
+            window.yiddishWords.forEach(function(word, index) {
+                var matches = !searchTerm || 
+                    word.transliteration.toLowerCase().includes(searchTerm) ||
+                    word.meaning.toLowerCase().includes(searchTerm) ||
+                    word.word.includes(searchTerm);
+                
+                if (matches) {
+                    count++;
+                    var isLearned = window.yiddishLearned.includes(word.transliteration);
+                    html += '<div class="yiddish-word-row' + (isLearned ? ' learned' : '') + '" onclick="window.handleWordClick(' + index + ')">' +
+                        '<span class="yiddish-row-num">' + (index + 1) + '.</span>' +
+                        '<span class="yiddish-row-hebrew">' + word.word + '</span>' +
+                        '<span class="yiddish-row-translit">' + word.transliteration + '</span>' +
+                        '<span class="yiddish-row-meaning">' + word.meaning + '</span>' +
+                        '<span class="yiddish-row-speaker">🔊</span>' +
+                    '</div>';
+                }
             });
             
-            grid.innerHTML = html || '<p style="text-align:center;color:#666;padding:20px;">No words found</p>';
+            list.innerHTML = html || '<p style="text-align:center;color:#666;padding:20px;">No words found</p>';
+            console.log('Filter found ' + count + ' words');
         };
         
         window.handleTileClick = function(transliteration) {
@@ -5224,7 +5198,7 @@
             }
             
             window.updateLearnedCount();
-            window.renderYiddishGrid();
+            window.renderYiddishList();
         };
         
         window.setYiddishSpeed = function(value) {
