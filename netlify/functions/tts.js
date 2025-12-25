@@ -1,52 +1,62 @@
-// Rabbi Moshe Text-to-Speech Function
-// Uses Gemini 2.5 Flash TTS Preview for warm, wise Rabbi voice
+// Netlify Serverless Function - Rabbi Voice Text-to-Speech
+// Uses Gemini 2.5 Flash TTS for warm, wise Rabbi voice
 
 exports.handler = async (event, context) => {
   // CORS headers for all responses
-  const headers = {
+  const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
   };
 
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return { statusCode: 204, headers: corsHeaders, body: '' };
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return { 
+      statusCode: 405, 
+      headers: corsHeaders, 
+      body: JSON.stringify({ error: 'Method Not Allowed' }) 
+    };
+  }
+
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  
+  if (!GEMINI_API_KEY) {
+    return { 
+      statusCode: 500, 
+      headers: corsHeaders, 
+      body: JSON.stringify({ error: 'API key not configured' }) 
+    };
   }
 
   try {
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    
-    if (!GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY not set');
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'API key not configured' })
-      };
-    }
-
     const { text, language = 'en' } = JSON.parse(event.body);
     
-    if (!text) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Text is required' })
+    if (!text || typeof text !== 'string') {
+      return { 
+        statusCode: 400, 
+        headers: corsHeaders, 
+        body: JSON.stringify({ error: 'Text is required' }) 
       };
     }
 
     // Style prompt for wise, warm elderly rabbi voice
     const stylePrompt = language === 'he' 
-      ? 'Speak as a warm, wise elderly rabbi with a gentle Israeli accent. Measured, thoughtful pace.'
-      : 'Speak as a warm, wise elderly rabbi. Gentle, fatherly voice full of wisdom. Measured pace with thoughtful pauses.';
+      ? `Speak as a warm, wise elderly rabbi in his 70s with a gentle Israeli accent.
+         Your voice should be fatherly, patient, and full of wisdom.
+         Pace should be measured and thoughtful, with natural pauses for emphasis.
+         Convey warmth and deep caring in every word.`
+      : `Speak as a warm, wise elderly rabbi in his 70s.
+         Your voice should be gentle, fatherly, and full of ancient wisdom.
+         Pace should be measured and thoughtful, with appropriate pauses for emphasis.
+         You have a slight Eastern European Jewish accent - warm and comforting.
+         Convey deep caring and patience in every word, like a loving grandfather sharing wisdom.`;
 
-    // Try Gemini 2.5 Flash TTS Preview
+    // Try Gemini 2.5 Flash Preview TTS (supports expressive voices)
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -54,14 +64,14 @@ exports.handler = async (event, context) => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{
-            parts: [{ text: `${stylePrompt}\n\nSay: "${text}"` }]
+            parts: [{ text: `${stylePrompt}\n\nSpeak the following text:\n"${text}"` }]
           }],
           generationConfig: {
             responseModalities: ['AUDIO'],
             speechConfig: {
               voiceConfig: {
                 prebuiltVoiceConfig: {
-                  voiceName: 'Charon' // Deep, warm male voice
+                  voiceName: 'Charon'
                 }
               }
             }
@@ -72,70 +82,40 @@ exports.handler = async (event, context) => {
 
     const data = await response.json();
     
-    console.log('TTS API response status:', response.status);
-    
     if (data.error) {
-      console.log('TTS API error:', data.error.message);
-      // Tell frontend to use browser TTS as fallback
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          useBrowserTTS: true,
-          text: text,
-          voiceSettings: {
-            rate: 0.85,
-            pitch: 0.9,
-            lang: language === 'he' ? 'he-IL' : 'en-US'
-          }
-        })
-      };
+      console.error('TTS API error:', data.error);
+      throw new Error(data.error.message || 'TTS generation failed');
     }
 
+    // Extract audio data
     const audioData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+    const mimeType = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || 'audio/L16;codec=pcm;rate=24000';
     
     if (!audioData) {
-      // No audio generated, use browser TTS
-      return {
-        statusCode: 200,
-        headers,
-        body: JSON.stringify({ 
-          useBrowserTTS: true,
-          text: text,
-          voiceSettings: {
-            rate: 0.85,
-            pitch: 0.9,
-            lang: language === 'he' ? 'he-IL' : 'en-US'
-          }
-        })
-      };
+      throw new Error('No audio generated');
     }
 
     return {
       statusCode: 200,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({ 
         audio: audioData,
-        mimeType: 'audio/L16;rate=24000',
+        mimeType: mimeType,
         model: 'gemini-2.5-flash-preview-tts'
       })
     };
 
   } catch (error) {
     console.error('TTS Error:', error);
-    // On any error, fallback to browser TTS
-    const { text = '', language = 'en' } = JSON.parse(event.body || '{}');
+    
+    // Return error with fallback suggestion
     return {
-      statusCode: 200,
-      headers,
+      statusCode: 500,
+      headers: corsHeaders,
       body: JSON.stringify({ 
-        useBrowserTTS: true,
-        text: text,
-        voiceSettings: {
-          rate: 0.85,
-          pitch: 0.9,
-          lang: language === 'he' ? 'he-IL' : 'en-US'
-        }
+        error: error.message,
+        fallback: 'browser-speech-synthesis',
+        message: 'TTS unavailable. Use browser speech synthesis as fallback.'
       })
     };
   }
