@@ -3659,6 +3659,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        text: message,
                         message: message,
                         conversationHistory: window.rabbiConversationHistory
                     })
@@ -4317,5 +4318,4 @@
 
             container.innerHTML = `
                 <div class="quiz-results">
-                    <h2>🕎 Your Sacred Pathways</h2>
-                    <p c
+                    <h2>🕎 Your Sacred
