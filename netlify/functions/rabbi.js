@@ -121,4 +121,60 @@ ${responseInstructions}`;
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: contents,
-                    sys
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                    generationConfig: {
+                        temperature: responseMode === 'deep' ? 0.85 : 0.8,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: maxTokens
+                    }
+                })
+            }
+        );
+
+        const data = await response.json();
+        
+        console.log('Gemini API response status:', response.status);
+        
+        if (!response.ok) {
+            console.error('Gemini API error:', JSON.stringify(data));
+            return {
+                statusCode: 500,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+                body: JSON.stringify({ 
+                    error: 'API error', 
+                    details: data.error?.message || 'Unknown error'
+                })
+            };
+        }
+
+        // Extract the response text
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+            'I apologize, but I could not generate a response. Please try again.';
+
+        console.log('Response generated successfully, length:', responseText.length);
+
+        return {
+            statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                response: responseText,
+                model: 'gemini-2.0-flash',
+                mode: responseMode
+            })
+        };
+
+    } catch (error) {
+        console.error('Function error:', error);
+        return {
+            statusCode: 500,
+            headers: { 'Access-Control-Allow-Origin': '*' },
+            body: JSON.stringify({ error: error.message })
+        };
+    }
+};
