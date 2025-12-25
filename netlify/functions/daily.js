@@ -1,46 +1,50 @@
-// Daily Inspiration Function
-// Uses Gemini 2.5 Flash (stable, fast, reliable)
+// Netlify Serverless Function - Daily Jewish Inspiration
+// Uses Gemini 2.5 Flash for generating blessings, verses, and pathway recommendations
 
 exports.handler = async (event, context) => {
   // CORS headers for all responses
-  const headers = {
+  const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
   };
 
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return { statusCode: 204, headers: corsHeaders, body: '' };
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return { 
+      statusCode: 405, 
+      headers: corsHeaders, 
+      body: JSON.stringify({ error: 'Method Not Allowed' }) 
+    };
+  }
+
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  
+  if (!GEMINI_API_KEY) {
+    console.error('GEMINI_API_KEY not set');
+    return { 
+      statusCode: 500, 
+      headers: corsHeaders, 
+      body: JSON.stringify({ error: 'API key not configured' }) 
+    };
   }
 
   try {
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    
-    if (!GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY not set');
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'API key not configured' })
-      };
-    }
-
-    const { type } = JSON.parse(event.body || '{}');
+    const { type, location } = JSON.parse(event.body || '{}');
 
     let prompt = '';
     
     if (type === 'blessing') {
-      prompt = `Generate a morning blessing for Dr. Stafford Goldstein, a 75-year-old retired gastroenterologist seeking meaning through Jewish pathways. 
+      prompt = `Generate a morning blessing for Dr. Stafford Goldstein, a 75-year-old retired gastroenterologist seeking meaning through Jewish pathways.
 
 Include:
 1. A traditional Hebrew blessing (transliterated) with English translation
-2. A brief personalized message (2-3 sentences) connecting the blessing to his journey of finding purpose in retirement
+2. A brief personalized message (2-3 sentences) connecting the blessing to finding purpose in retirement
 
 Keep it warm, encouraging, and concise. Format as JSON:
 {
@@ -61,7 +65,7 @@ Format as JSON:
   "reflection": "Brief 1-2 sentence reflection on how this applies to finding meaning in retirement"
 }`;
     } else if (type === 'pathway') {
-      prompt = `Recommend one of the 60 sacred pathways for Dr. Stafford Goldstein today. The pathways include:
+      prompt = `Recommend one of the 60 sacred pathways for Dr. Stafford Goldstein today. Categories include:
 - Torah study (kollel, medical ethics, Daf Yomi, Pirkei Avot)
 - Chesed work (free clinics, bikur cholim, Israel missions, senior advocacy)
 - Tikkun olam (environmental stewardship, healthcare policy)
@@ -78,15 +82,25 @@ Format as JSON:
   "description": "Brief 2-3 sentence description",
   "firstStep": "One concrete action to take today"
 }`;
+    } else if (type === 'shabbat') {
+      prompt = `Provide Shabbat guidance and spiritual preparation for this week.
+
+Format as JSON:
+{
+  "greeting": "Shabbat greeting in Hebrew (transliterated) with translation",
+  "preparation": "One spiritual preparation tip for Shabbat",
+  "teaching": "A brief teaching about Shabbat's meaning",
+  "note": "Note that exact candle lighting times should be verified with a local Jewish calendar"
+}`;
     } else {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Invalid type. Use: blessing, verse, or pathway' })
+      return { 
+        statusCode: 400, 
+        headers: corsHeaders, 
+        body: JSON.stringify({ error: 'Invalid type. Use: blessing, verse, pathway, or shabbat' }) 
       };
     }
 
-    // Call Gemini 2.5 Flash API (stable)
+    // Call Gemini 2.5 Flash API (stable, fast)
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
@@ -104,18 +118,9 @@ Format as JSON:
 
     const data = await response.json();
     
-    console.log('Gemini API response status:', response.status);
-    
     if (!response.ok) {
       console.error('Gemini API error:', JSON.stringify(data));
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ 
-          error: 'API error', 
-          details: data.error?.message || 'Unknown error'
-        })
-      };
+      throw new Error(data.error?.message || 'API request failed');
     }
 
     let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -129,24 +134,24 @@ Format as JSON:
       result = JSON.parse(responseText);
     } catch (parseError) {
       console.error('JSON parse error:', parseError);
-      // Return raw text if JSON parsing fails
       result = { raw: responseText };
     }
 
     return {
       statusCode: 200,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({
         type: type,
-        data: result
+        data: result,
+        model: 'gemini-2.5-flash'
       })
     };
 
   } catch (error) {
-    console.error('Function error:', error);
+    console.error('Daily function error:', error);
     return {
       statusCode: 500,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({ error: error.message })
     };
   }
