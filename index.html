@@ -4503,11 +4503,13 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
         function initializeEventListeners() {
             console.log('🔗 Initializing event listeners...');
             
-            // Rabbi toggle buttons
+            // Rabbi toggle button - DO NOT add addEventListener here!
+            // The button already has onclick="window.toggleRabbiChat()" in HTML
+            // Adding addEventListener causes DOUBLE firing (open then immediately close)
             const rabbiToggleBtn = document.getElementById('rabbiToggleBtn');
             if (rabbiToggleBtn) {
-                rabbiToggleBtn.addEventListener('click', toggleRabbiChat);
-                console.log('✅ Rabbi toggle button connected');
+                // Just log that we found it, don't add another click handler!
+                console.log('✅ Rabbi toggle button found (using onclick handler)');
             } else {
                 console.error('❌ Rabbi toggle button not found!');
             }
