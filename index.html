@@ -3894,112 +3894,6 @@
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // 📿 DAILY INSPIRATION
-        // ═══════════════════════════════════════════════════════════════
-        function toggleDailyCard(card) {
-            card.classList.toggle('expanded');
-        }
-
-        async function loadDailyContent() {
-            // Load daily blessing
-            loadDailyItem('blessing', 'dailyBlessingCard', 'dailyBlessingContent');
-            
-            // Load daily verse
-            loadDailyItem('verse', 'dailyVerseCard', 'dailyVerseContent');
-            
-            // Load daily pathway
-            loadDailyItem('pathway', 'dailyPathwayCard', 'dailyPathwayContent');
-            
-            // Load Shabbat times
-            loadShabbatTimes();
-        }
-
-        async function loadDailyItem(type, cardId, contentId) {
-            try {
-                const response = await fetch('/.netlify/functions/daily', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type })
-                });
-
-                const data = await response.json();
-                const card = document.getElementById(cardId);
-                const contentDiv = document.getElementById(contentId);
-                
-                if (data.content) {
-                    // Set preview (first line or first 50 chars)
-                    const preview = data.content.split('\n')[0].substring(0, 60) + '...';
-                    card.querySelector('.preview').textContent = preview;
-                    
-                    // Set full content
-                    contentDiv.innerHTML = data.content.replace(/\n/g, '<br>');
-                }
-            } catch (error) {
-                console.error(`Error loading ${type}:`, error);
-                document.getElementById(cardId).querySelector('.preview').textContent = 'Tap to refresh';
-            }
-        }
-
-        async function loadShabbatTimes() {
-            try {
-                // Get user's location
-                let location = { lat: 40.7128, lng: -74.0060, timezone: 'America/New_York' }; // Default NYC
-                
-                if (navigator.geolocation) {
-                    try {
-                        const pos = await new Promise((resolve, reject) => {
-                            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
-                        });
-                        location.lat = pos.coords.latitude;
-                        location.lng = pos.coords.longitude;
-                    } catch (e) {
-                        console.log('Using default location');
-                    }
-                }
-
-                const response = await fetch('/.netlify/functions/daily', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ type: 'shabbat', location })
-                });
-
-                const data = await response.json();
-                const card = document.getElementById('shabbatCard');
-                const contentDiv = document.getElementById('shabbatContent');
-                
-                if (data.shabbat && data.shabbat.items) {
-                    const items = data.shabbat.items;
-                    const candleLighting = items.find(i => i.category === 'candles');
-                    const havdalah = items.find(i => i.category === 'havdalah');
-                    const parasha = items.find(i => i.category === 'parashat');
-                    
-                    let preview = '';
-                    if (candleLighting) {
-                        const time = new Date(candleLighting.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-                        preview = `🕯️ Candles: ${time}`;
-                    }
-                    card.querySelector('.preview').textContent = preview || 'Shabbat info loaded';
-                    
-                    let fullContent = '<div style="text-align: left;">';
-                    if (parasha) fullContent += `<p><strong>📖 Parashat ${parasha.hebrew}</strong><br>${parasha.title}</p>`;
-                    if (candleLighting) {
-                        const time = new Date(candleLighting.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', weekday: 'short' });
-                        fullContent += `<p>🕯️ <strong>Candle Lighting:</strong> ${time}</p>`;
-                    }
-                    if (havdalah) {
-                        const time = new Date(havdalah.date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', weekday: 'short' });
-                        fullContent += `<p>✨ <strong>Havdalah:</strong> ${time}</p>`;
-                    }
-                    fullContent += '</div>';
-                    contentDiv.innerHTML = fullContent;
-                }
-            } catch (error) {
-                console.error('Shabbat times error:', error);
-                document.getElementById('shabbatCard').querySelector('.preview').textContent = 'Tap to refresh';
-            }
-        }
-
-        // ═══════════════════════════════════════════════════════════════
         // 🎯 PATHWAY QUIZ
         // ═══════════════════════════════════════════════════════════════
         const quizQuestions = [
@@ -4240,9 +4134,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🕎 Jewish Renaissance AI Features Loaded');
             
-            // Load daily content after a short delay
-            setTimeout(loadDailyContent, 1000);
-            
             // Add quiz button to sidebar or welcome section
             addQuizButton();
         });
@@ -4284,58 +4175,29 @@
         // 📜 TORAH PORTION - Weekly Parasha with Deep Teaching
         // ═══════════════════════════════════════════════════════════════
         async function loadTorahPortion() {
-            addMessageToChat('rabbi', '📜 Let me find this week\'s Torah portion and prepare a deep teaching for you, Dr. Goldstein...');
+            addMessageToChat('rabbi', '📜 Let me share this week\'s Torah portion and prepare a teaching for you, Dr. Goldstein...');
             showTypingIndicator();
             
             try {
-                // Step 1: Get current parasha from Hebcal API
+                // Get today's date for context
                 const today = new Date();
-                const hebcalUrl = `https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&year=${today.getFullYear()}&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=5128581&M=on&s=on`;
+                const dateStr = today.toLocaleDateString('en-US', { 
+                    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
+                });
                 
-                let parashaName = '';
-                let parashaHebrew = '';
-                let parashaDate = '';
-                
-                try {
-                    const hebcalResponse = await fetch(hebcalUrl);
-                    const hebcalData = await hebcalResponse.json();
-                    
-                    const parashaItems = hebcalData.items.filter(item => 
-                        item.category === 'parashat' || item.title.includes('Parashat')
-                    );
-                    
-                    if (parashaItems.length > 0) {
-                        const now = new Date();
-                        const upcomingParasha = parashaItems.find(p => new Date(p.date) >= now) || parashaItems[0];
-                        parashaName = upcomingParasha.title.replace('Parashat ', '');
-                        parashaHebrew = upcomingParasha.hebrew || '';
-                        parashaDate = new Date(upcomingParasha.date).toLocaleDateString('en-US', { 
-                            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
-                        });
-                    }
-                } catch (hebcalError) {
-                    console.log('Hebcal API error:', hebcalError);
-                }
-                
-                // Step 2: Ask Rabbi for deep teaching
-                const torahPrompt = parashaName 
-                    ? `Please provide a comprehensive teaching on this week's Torah portion: Parashat ${parashaName} ${parashaHebrew ? '(' + parashaHebrew + ')' : ''}.
+                // Ask Rabbi directly for the Torah portion (he knows the calendar!)
+                const torahPrompt = `Today is ${dateStr}. Please provide a comprehensive teaching on this week's Torah portion (Parashat HaShavua).
 
-Include:
-1. **The Portion Overview**: What chapters/verses does this parasha cover and what is the main narrative?
-2. **Key Stories & Events**: Summarize the major events and characters
-3. **Deep Spiritual Insights**: What are the deeper meanings? Include insights from Rashi, Ramban, and other commentators
-4. **Practical Life Lessons**: How does this apply to daily life, especially for a retired physician seeking meaning?
-5. **Connection to Jewish Values**: How does this portion connect to chesed, tikkun olam, or other Jewish values?
-6. **A Blessing**: End with an appropriate blessing or reflection
+As Rabbi Moshe ben David, please include:
 
-Please provide a rich, meaningful teaching as if delivering a Shabbat sermon.`
-                    : `Please tell me about this week's Torah portion (Parashat HaShavua). Provide:
-1. The name of the portion and what it covers
-2. Key stories and events
-3. Deep spiritual insights from commentators
-4. Practical life lessons
-5. A meaningful blessing`;
+1. **📖 The Portion**: Name this week's parasha (in Hebrew and English) and what chapters/verses it covers
+2. **📜 Overview**: What is the main narrative and key events?
+3. **✨ Spiritual Insights**: Share deeper meanings from Rashi, Ramban, and other commentators
+4. **💡 Life Lessons**: How does this apply to a retired physician seeking meaning and purpose?
+5. **🕯️ Connection to Jewish Values**: How does this portion connect to chesed, tikkun olam, or Torah study?
+6. **🙏 Closing Blessing**: End with an appropriate blessing
+
+Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon.`;
 
                 const response = await fetch('/.netlify/functions/rabbi', {
                     method: 'POST',
@@ -4352,21 +4214,20 @@ Please provide a rich, meaningful teaching as if delivering a Shabbat sermon.`
                 // Remove the loading message
                 const messages = document.querySelectorAll('.rabbi-message.rabbi');
                 const lastMsg = messages[messages.length - 1];
-                if (lastMsg && lastMsg.textContent.includes('Let me find this week')) {
+                if (lastMsg && lastMsg.textContent.includes('Let me share this week')) {
                     lastMsg.remove();
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
                 }
 
                 const data = await response.json();
                 
                 if (data.error) {
-                    addMessageToChat('rabbi', '📜 I apologize, but I had trouble retrieving the Torah portion teaching. Please try again.');
+                    addMessageToChat('rabbi', '📜 I apologize, but I encountered an error. Please check your connection and try again.');
                 } else {
-                    let header = '';
-                    if (parashaName) {
-                        header = `📜 **This Week's Torah Portion**\n\n**Parashat ${parashaName}** ${parashaHebrew ? '(' + parashaHebrew + ')' : ''}\n${parashaDate ? '📅 ' + parashaDate : ''}\n\n---\n\n`;
-                    }
-                    addMessageToChat('rabbi', header + data.response);
-                    
+                    addMessageToChat('rabbi', data.response);
                     rabbiConversationHistory.push({ role: 'user', content: 'Tell me about this week\'s Torah portion' });
                     rabbiConversationHistory.push({ role: 'assistant', content: data.response });
                 }
@@ -4376,7 +4237,7 @@ Please provide a rich, meaningful teaching as if delivering a Shabbat sermon.`
                 
                 const messages = document.querySelectorAll('.rabbi-message.rabbi');
                 const lastMsg = messages[messages.length - 1];
-                if (lastMsg && lastMsg.textContent.includes('Let me find this week')) {
+                if (lastMsg && lastMsg.textContent.includes('Let me share this week')) {
                     lastMsg.remove();
                 }
                 
@@ -4385,5 +4246,92 @@ Please provide a rich, meaningful teaching as if delivering a Shabbat sermon.`
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // 🔗 EVENT LISTENERS - Bind all buttons after DOM loads
-        // ═══════════════════════════════════════
+        // 🔗 EVENT LISTENERS - Bind all buttons
+        // ═══════════════════════════════════════════════════════════════
+        function initializeEventListeners() {
+            console.log('🔗 Initializing event listeners...');
+            
+            // Rabbi toggle buttons
+            const rabbiToggleBtn = document.getElementById('rabbiToggleBtn');
+            if (rabbiToggleBtn) {
+                rabbiToggleBtn.addEventListener('click', toggleRabbiChat);
+                console.log('✅ Rabbi toggle button connected');
+            } else {
+                console.error('❌ Rabbi toggle button not found!');
+            }
+            
+            const rabbiCloseBtn = document.getElementById('rabbiCloseBtn');
+            if (rabbiCloseBtn) {
+                rabbiCloseBtn.addEventListener('click', toggleRabbiChat);
+            }
+            
+            // Fullscreen button
+            const fullscreenBtn = document.getElementById('fullscreenBtn');
+            if (fullscreenBtn) {
+                fullscreenBtn.addEventListener('click', toggleRabbiFullscreen);
+            }
+            
+            // Language buttons
+            const langEnBtn = document.getElementById('langEnBtn');
+            if (langEnBtn) {
+                langEnBtn.addEventListener('click', function() { setLanguageMode('en'); });
+            }
+            
+            const langHeBtn = document.getElementById('langHeBtn');
+            if (langHeBtn) {
+                langHeBtn.addEventListener('click', function() { setLanguageMode('he'); });
+            }
+            
+            // Translate button
+            const translateBtn = document.getElementById('translateBtn');
+            if (translateBtn) {
+                translateBtn.addEventListener('click', translateLastMessage);
+            }
+            
+            // Torah Portion button
+            const torahPortionBtn = document.getElementById('torahPortionBtn');
+            if (torahPortionBtn) {
+                torahPortionBtn.addEventListener('click', loadTorahPortion);
+            }
+            
+            // Voice input button
+            const voiceInputBtn = document.getElementById('voiceInputBtn');
+            if (voiceInputBtn) {
+                voiceInputBtn.addEventListener('click', toggleVoiceInput);
+            }
+            
+            // Send button
+            const rabbiSendBtn = document.getElementById('rabbiSendBtn');
+            if (rabbiSendBtn) {
+                rabbiSendBtn.addEventListener('click', sendRabbiMessage);
+            }
+            
+            // Input keypress
+            const rabbiInput = document.getElementById('rabbiInput');
+            if (rabbiInput) {
+                rabbiInput.addEventListener('keypress', function(event) {
+                    if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        sendRabbiMessage();
+                    }
+                });
+            }
+            
+            console.log('🔗 All event listeners attached');
+        }
+        
+        // Run initialization when DOM is ready or immediately if already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeEventListeners);
+        } else {
+            // DOM already loaded, run immediately
+            initializeEventListeners();
+        }
+
+        console.log('✅ All AI features initialized');
+        console.log('🕎 Rabbi Moshe ben David is ready to assist');
+        console.log('🎯 Pathway quiz ready');
+    </script>
+
+</body>
+</html>
