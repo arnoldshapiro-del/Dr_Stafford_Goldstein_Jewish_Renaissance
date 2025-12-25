@@ -382,7 +382,7 @@
             width: 70px;
             height: 70px;
             border-radius: 50%;
-            background: var(--gradient-torah);
+            background: linear-gradient(135deg, #f5f0e6 0%, #e8dcc8 100%);
             border: 3px solid var(--synagogue-gold);
             cursor: pointer;
             box-shadow: 0 8px 30px rgba(0,0,0,0.3);
@@ -392,7 +392,12 @@
             font-size: 2rem;
             transition: all 0.3s ease;
             overflow: hidden;
-            padding: 0;
+            padding: 4px;
+        }
+        
+        .rabbi-toggle-btn svg {
+            width: 100%;
+            height: 100%;
         }
         
         .rabbi-toggle-btn img {
@@ -3483,18 +3488,73 @@
          🕎 RABBI MOSHE BEN DAVID - AI CHAT INTERFACE
          ═══════════════════════════════════════════════════════════════ -->
     <div class="rabbi-chat-container">
-        <button class="rabbi-toggle-btn" id="rabbiToggleBtn" title="Talk to Rabbi Moshe">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Menachem_Mendel_Schneerson2.jpg/100px-Menachem_Mendel_Schneerson2.jpg" 
-                 alt="Rabbi" 
-                 onerror="this.style.display='none'; this.parentElement.innerHTML='🕎';">
+        <button class="rabbi-toggle-btn" id="rabbiToggleBtn" title="Talk to Rabbi Moshe" onclick="toggleRabbiChat()">
+            <svg viewBox="0 0 100 100" width="100%" height="100%">
+                <!-- Lubavitcher Rabbi illustration - black hat, white beard -->
+                <defs>
+                    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#f5deb3"/>
+                        <stop offset="100%" style="stop-color:#deb887"/>
+                    </linearGradient>
+                    <linearGradient id="hatGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" style="stop-color:#2a2a2a"/>
+                        <stop offset="100%" style="stop-color:#1a1a1a"/>
+                    </linearGradient>
+                </defs>
+                <!-- Black Fedora Hat -->
+                <ellipse cx="50" cy="28" rx="38" ry="8" fill="url(#hatGrad)"/>
+                <rect x="22" y="8" width="56" height="20" rx="3" fill="url(#hatGrad)"/>
+                <ellipse cx="50" cy="8" rx="28" ry="6" fill="#333"/>
+                <!-- Face -->
+                <ellipse cx="50" cy="52" rx="22" ry="24" fill="url(#skinGrad)"/>
+                <!-- Eyes -->
+                <ellipse cx="42" cy="45" rx="3" ry="2" fill="#4a3728"/>
+                <ellipse cx="58" cy="45" rx="3" ry="2" fill="#4a3728"/>
+                <circle cx="42" cy="45" r="1" fill="#222"/>
+                <circle cx="58" cy="45" r="1" fill="#222"/>
+                <!-- Eyebrows -->
+                <path d="M36 40 Q42 38 48 41" stroke="#888" stroke-width="1.5" fill="none"/>
+                <path d="M52 41 Q58 38 64 40" stroke="#888" stroke-width="1.5" fill="none"/>
+                <!-- Nose -->
+                <path d="M50 46 L50 54 Q48 56 50 56 Q52 56 50 54" stroke="#c9a87c" stroke-width="1.5" fill="none"/>
+                <!-- White Beard -->
+                <path d="M28 55 Q30 52 35 50 Q38 65 50 85 Q62 65 65 50 Q70 52 72 55 Q75 70 50 95 Q25 70 28 55" fill="#f5f5f5"/>
+                <path d="M32 58 Q40 55 50 75 Q45 60 38 58" fill="#e8e8e8"/>
+                <path d="M68 58 Q60 55 50 75 Q55 60 62 58" fill="#e8e8e8"/>
+                <!-- Payot (sidelocks) -->
+                <path d="M28 35 Q24 45 26 60 Q28 65 30 62 Q28 50 30 40" fill="#f0f0f0"/>
+                <path d="M72 35 Q76 45 74 60 Q72 65 70 62 Q72 50 70 40" fill="#f0f0f0"/>
+                <!-- Kind smile -->
+                <path d="M44 62 Q50 66 56 62" stroke="#8b6f5c" stroke-width="1" fill="none"/>
+            </svg>
         </button>
         
         <div class="rabbi-chat-window" id="rabbiChatWindow">
             <div class="rabbi-header">
                 <div class="rabbi-avatar">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Menachem_Mendel_Schneerson2.jpg/100px-Menachem_Mendel_Schneerson2.jpg" 
-                         alt="Rabbi Moshe ben David" 
-                         onerror="this.style.display='none'; this.parentElement.innerHTML='🕎';">
+                    <svg viewBox="0 0 100 100" width="100%" height="100%">
+                        <!-- Lubavitcher Rabbi illustration -->
+                        <defs>
+                            <linearGradient id="skinGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" style="stop-color:#f5deb3"/>
+                                <stop offset="100%" style="stop-color:#deb887"/>
+                            </linearGradient>
+                        </defs>
+                        <!-- Black Hat -->
+                        <ellipse cx="50" cy="28" rx="38" ry="8" fill="#1a1a1a"/>
+                        <rect x="22" y="8" width="56" height="20" rx="3" fill="#222"/>
+                        <ellipse cx="50" cy="8" rx="28" ry="6" fill="#333"/>
+                        <!-- Face -->
+                        <ellipse cx="50" cy="52" rx="22" ry="24" fill="url(#skinGrad2)"/>
+                        <!-- Eyes -->
+                        <ellipse cx="42" cy="45" rx="3" ry="2" fill="#4a3728"/>
+                        <ellipse cx="58" cy="45" rx="3" ry="2" fill="#4a3728"/>
+                        <!-- White Beard -->
+                        <path d="M28 55 Q30 52 35 50 Q38 65 50 85 Q62 65 65 50 Q70 52 72 55 Q75 70 50 95 Q25 70 28 55" fill="#f5f5f5"/>
+                        <!-- Payot -->
+                        <path d="M28 35 Q24 45 26 60 Q28 65 30 62 Q28 50 30 40" fill="#f0f0f0"/>
+                        <path d="M72 35 Q76 45 74 60 Q72 65 70 62 Q72 50 70 40" fill="#f0f0f0"/>
+                    </svg>
                 </div>
                 <div class="rabbi-info">
                     <h3>Rabbi Moshe ben David</h3>
@@ -4248,85 +4308,4 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
                 const data = await response.json();
                 
                 if (data.error) {
-                    addMessageToChat('rabbi', '📜 I apologize, but I encountered an error. Please check your connection and try again.');
-                } else {
-                    addMessageToChat('rabbi', data.response);
-                    rabbiConversationHistory.push({ role: 'user', content: 'Tell me about this week\'s Torah portion' });
-                    rabbiConversationHistory.push({ role: 'assistant', content: data.response });
-                }
-            } catch (error) {
-                hideTypingIndicator();
-                console.error('Torah portion error:', error);
-                
-                const messages = document.querySelectorAll('.rabbi-message.rabbi');
-                const lastMsg = messages[messages.length - 1];
-                if (lastMsg && lastMsg.textContent.includes('Let me share this week')) {
-                    lastMsg.remove();
-                }
-                
-                addMessageToChat('rabbi', '📜 I apologize, but I encountered an error. Please check your connection and try again.');
-            }
-        }
-
-        // ═══════════════════════════════════════════════════════════════
-        // 🔗 EVENT LISTENERS - Bind all buttons
-        // ═══════════════════════════════════════════════════════════════
-        function initializeEventListeners() {
-            console.log('🔗 Initializing event listeners...');
-            
-            // Rabbi toggle buttons
-            const rabbiToggleBtn = document.getElementById('rabbiToggleBtn');
-            if (rabbiToggleBtn) {
-                rabbiToggleBtn.addEventListener('click', toggleRabbiChat);
-                console.log('✅ Rabbi toggle button connected');
-            } else {
-                console.error('❌ Rabbi toggle button not found!');
-            }
-            
-            const rabbiCloseBtn = document.getElementById('rabbiCloseBtn');
-            if (rabbiCloseBtn) {
-                rabbiCloseBtn.addEventListener('click', toggleRabbiChat);
-            }
-            
-            // Fullscreen button
-            const fullscreenBtn = document.getElementById('fullscreenBtn');
-            if (fullscreenBtn) {
-                fullscreenBtn.addEventListener('click', toggleRabbiFullscreen);
-            }
-            
-            // Language buttons
-            const langEnBtn = document.getElementById('langEnBtn');
-            if (langEnBtn) {
-                langEnBtn.addEventListener('click', function() { setLanguageMode('en'); });
-            }
-            
-            const langHeBtn = document.getElementById('langHeBtn');
-            if (langHeBtn) {
-                langHeBtn.addEventListener('click', function() { setLanguageMode('he'); });
-            }
-            
-            // Translate button
-            const translateBtn = document.getElementById('translateBtn');
-            if (translateBtn) {
-                translateBtn.addEventListener('click', translateLastMessage);
-            }
-            
-            // Torah Portion button
-            const torahPortionBtn = document.getElementById('torahPortionBtn');
-            if (torahPortionBtn) {
-                torahPortionBtn.addEventListener('click', loadTorahPortion);
-            }
-            
-            // Voice input button
-            const voiceInputBtn = document.getElementById('voiceInputBtn');
-            if (voiceInputBtn) {
-                voiceInputBtn.addEventListener('click', toggleVoiceInput);
-            }
-            
-            // Send button
-            const rabbiSendBtn = document.getElementById('rabbiSendBtn');
-            if (rabbiSendBtn) {
-                rabbiSendBtn.addEventListener('click', sendRabbiMessage);
-            }
-            
-        
+                    addMessageToChat('rabbi', '📜 I apologize, but I encountered an error. Please check your conn
