@@ -3488,7 +3488,7 @@
          🕎 RABBI MOSHE BEN DAVID - AI CHAT INTERFACE
          ═══════════════════════════════════════════════════════════════ -->
     <div class="rabbi-chat-container">
-        <button class="rabbi-toggle-btn" id="rabbiToggleBtn" title="Talk to Rabbi Moshe">
+        <button class="rabbi-toggle-btn" id="rabbiToggleBtn" title="Talk to Rabbi Moshe" onclick="window.toggleRabbiChat()">
             <svg viewBox="0 0 100 100" width="100%" height="100%">
                 <!-- Lubavitcher Rabbi illustration - black hat, white beard -->
                 <defs>
@@ -3600,6 +3600,27 @@
         </div>
     </div>
 
+    <!-- Define toggleRabbiChat EARLY so onclick works -->
+    <script>
+        console.log('📍 Early script: Defining toggleRabbiChat');
+        window.toggleRabbiChat = function() {
+            console.log('🕎 toggleRabbiChat CALLED!');
+            var chatWindow = document.getElementById('rabbiChatWindow');
+            if (!chatWindow) {
+                console.error('❌ Chat window not found!');
+                alert('Chat window not found!');
+                return;
+            }
+            chatWindow.classList.toggle('open');
+            console.log('Chat window open state:', chatWindow.classList.contains('open'));
+            if (chatWindow.classList.contains('open')) {
+                var input = document.getElementById('rabbiInput');
+                if (input) input.focus();
+            }
+        };
+        console.log('✅ toggleRabbiChat is now:', typeof window.toggleRabbiChat);
+    </script>
+
     <!-- Daily widgets removed - Rabbi chat with Torah Portion is the main AI feature -->
 
     <!-- ═══════════════════════════════════════════════════════════════
@@ -3615,6 +3636,8 @@
          🚀 AI FEATURES JAVASCRIPT
          ═══════════════════════════════════════════════════════════════ -->
     <script>
+        console.log('🚀 RABBI SCRIPT BLOCK STARTING');
+        
         // ═══════════════════════════════════════════════════════════════
         // 🕎 RABBI CHAT SYSTEM
         // ═══════════════════════════════════════════════════════════════
@@ -3624,7 +3647,9 @@
         let mediaRecorder = null;
         let speechRecognition = null;
 
-        function toggleRabbiChat() {
+        // Define GLOBALLY on window object to ensure availability
+        window.toggleRabbiChat = function() {
+            console.log('🕎 toggleRabbiChat CALLED!');
             const chatWindow = document.getElementById('rabbiChatWindow');
             chatWindow.classList.toggle('open');
             if (chatWindow.classList.contains('open')) {
@@ -4282,31 +4307,4 @@ As Rabbi Moshe ben David, please include:
 
 Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon.`;
 
-                const response = await fetch('/.netlify/functions/rabbi', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: torahPrompt,
-                        conversationHistory: [],
-                        language: currentLanguageMode
-                    })
-                });
-
-                hideTypingIndicator();
-                
-                // Remove the loading message
-                const messages = document.querySelectorAll('.rabbi-message.rabbi');
-                const lastMsg = messages[messages.length - 1];
-                if (lastMsg && lastMsg.textContent.includes('Let me share this week')) {
-                    lastMsg.remove();
-                }
-
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                if (data.error) {
-                    addMessageToChat('rabbi', '📜 I apologize, but I encountered an error. Please check your connection and try again.');
-   
+                const respons
