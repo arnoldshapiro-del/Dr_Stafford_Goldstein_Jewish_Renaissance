@@ -1314,6 +1314,94 @@
             cursor: not-allowed;
         }
         
+        /* Yiddish Audio Controls */
+        .yiddish-audio-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+            border-radius: 15px;
+        }
+        
+        .yiddish-spinner-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .yiddish-control-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .yiddish-stop-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .yiddish-stop-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+        
+        .yiddish-speed-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 0.85rem;
+        }
+        
+        .yiddish-speed-control input[type="range"] {
+            width: 100px;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .yiddish-speed-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .yiddish-speed-control input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FFD700 0%, #B8860B 100%);
+            cursor: pointer;
+            border: none;
+        }
+        
+        #yiddishSpeedValue {
+            min-width: 40px;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
         /* Message Action Buttons */
         .rabbi-message-actions {
             display: flex;
@@ -4635,17 +4723,80 @@
             var word = window.yiddishWords[window.currentYiddishIndex];
             var text = word.transliteration + '. ' + word.meaning + '. For example: ' + word.example;
             
+            // Show spinner and controls
+            var btn = document.querySelector('.yiddish-speak-btn');
+            if (btn) {
+                btn.outerHTML = '<div class="yiddish-audio-controls" id="yiddishAudioControls">' +
+                    '<div class="yiddish-spinner-row">' +
+                        '<div class="rabbi-spinner"></div>' +
+                        '<span>Rabbi is speaking...</span>' +
+                    '</div>' +
+                    '<div class="yiddish-control-row">' +
+                        '<button class="yiddish-stop-btn" onclick="window.stopYiddishSpeech()">⏹️ Stop</button>' +
+                        '<div class="yiddish-speed-control">' +
+                            '<span>Speed:</span>' +
+                            '<input type="range" id="yiddishSpeedSlider" min="0.5" max="2" step="0.1" value="1" oninput="window.changeYiddishSpeed(this.value)">' +
+                            '<span id="yiddishSpeedValue">1.0x</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }
+            
             // Create a temporary element to speak
             var tempEl = document.createElement('div');
+            tempEl.id = 'yiddishTempSpeech';
             tempEl.innerHTML = '<p>' + text + '</p>';
+            tempEl.style.display = 'none';
             document.body.appendChild(tempEl);
             
-            await window.speakMessage(tempEl);
+            // Store reference for stopping
+            window.yiddishSpeechElement = tempEl;
             
-            // Remove after starting speech
-            setTimeout(function() {
-                document.body.removeChild(tempEl);
-            }, 1000);
+            await window.speakMessage(tempEl);
+        };
+        
+        window.stopYiddishSpeech = function() {
+            window.stopSpeech();
+            window.resetYiddishSpeakButton();
+            
+            // Remove temp element
+            var tempEl = document.getElementById('yiddishTempSpeech');
+            if (tempEl) tempEl.remove();
+        };
+        
+        window.changeYiddishSpeed = function(value) {
+            var state = window.rabbiSpeechState;
+            state.rate = parseFloat(value);
+            var speedEl = document.getElementById('yiddishSpeedValue');
+            if (speedEl) speedEl.textContent = parseFloat(value).toFixed(1) + 'x';
+            
+            // Also update the main speed slider if it exists
+            var mainSlider = document.getElementById('speedSlider');
+            if (mainSlider) mainSlider.value = value;
+            var mainSpeedEl = document.getElementById('speedValue');
+            if (mainSpeedEl) mainSpeedEl.textContent = parseFloat(value).toFixed(1) + 'x';
+            
+            // Update playback rate if playing
+            if (state.currentSource) {
+                state.currentSource.playbackRate.value = state.rate;
+            }
+        };
+        
+        window.resetYiddishSpeakButton = function() {
+            var controls = document.getElementById('yiddishAudioControls');
+            if (controls) {
+                controls.outerHTML = '<button class="yiddish-speak-btn" onclick="window.speakYiddishWord()">🔊 Hear Rabbi Pronounce It</button>';
+            }
+        };
+        
+        // Override the original stopSpeech to also reset Yiddish button
+        var originalStopSpeech = window.stopSpeech;
+        window.stopSpeech = function() {
+            originalStopSpeech();
+            window.resetYiddishSpeakButton();
+            
+            var tempEl = document.getElementById('yiddishTempSpeech');
+            if (tempEl) tempEl.remove();
         };
         
         // Stop generation
