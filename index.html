@@ -578,6 +578,22 @@
             background: rgba(184, 134, 11, 0.5);
             transform: scale(1.05);
         }
+        
+        .torah-btn {
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.4) 0%, rgba(139, 105, 20, 0.4) 100%) !important;
+            border: 2px solid var(--synagogue-gold) !important;
+            animation: torahGlow 3s ease-in-out infinite;
+        }
+        
+        .torah-btn:hover {
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.7) 0%, rgba(139, 105, 20, 0.7) 100%) !important;
+            transform: scale(1.05);
+        }
+        
+        @keyframes torahGlow {
+            0%, 100% { box-shadow: 0 0 5px rgba(184, 134, 11, 0.3); }
+            50% { box-shadow: 0 0 15px rgba(184, 134, 11, 0.6); }
+        }
 
         .rabbi-toolbar {
             display: flex;
@@ -3457,6 +3473,9 @@
                 <button class="rabbi-tool-btn" onclick="translateLastMessage()" title="Translate last message">
                     🔄 Translate
                 </button>
+                <button class="rabbi-tool-btn torah-btn" onclick="loadTorahPortion()" title="This week's Torah portion with deep teaching">
+                    📜 Torah Portion
+                </button>
             </div>
             
             <div class="rabbi-messages" id="rabbiMessages">
@@ -3643,8 +3662,21 @@
         // 🔊 TEXT-TO-SPEECH (Rabbi Voice)
         // ═══════════════════════════════════════════════════════════════
         async function speakMessage(messageElement) {
-            const text = messageElement.querySelector('p').textContent;
+            // Get text from the message, handling multiple paragraphs
+            const paragraphs = messageElement.querySelectorAll('p');
+            let text = '';
+            for (let p of paragraphs) {
+                text += p.textContent + ' ';
+            }
+            text = text.trim();
+            
+            if (!text) {
+                console.log('No text to speak');
+                return;
+            }
+            
             const speakerBtn = messageElement.querySelector('.speaker-btn');
+            if (!speakerBtn) return;
             
             speakerBtn.innerHTML = '⏳';
             speakerBtn.disabled = true;
@@ -3655,7 +3687,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        text: text,
+                        text: text.substring(0, 1000), // Limit text length
                         language: currentLanguageMode
                     })
                 });
@@ -3663,35 +3695,83 @@
                 const data = await response.json();
                 
                 if (data.audio) {
-                    // Play audio from base64
-                    const audioData = atob(data.audio);
-                    const audioArray = new Uint8Array(audioData.length);
-                    for (let i = 0; i < audioData.length; i++) {
-                        audioArray[i] = audioData.charCodeAt(i);
+                    // Gemini returns base64 audio - could be WAV or raw PCM
+                    // Try to play it directly first
+                    try {
+                        const audioData = atob(data.audio);
+                        const audioArray = new Uint8Array(audioData.length);
+                        for (let i = 0; i < audioData.length; i++) {
+                            audioArray[i] = audioData.charCodeAt(i);
+                        }
+                        
+                        // Determine audio type from the data or use wav
+                        const mimeType = data.mimeType || 'audio/wav';
+                        const audioBlob = new Blob([audioArray], { type: mimeType });
+                        const audioUrl = URL.createObjectURL(audioBlob);
+                        const audio = new Audio(audioUrl);
+                        
+                        audio.onended = () => {
+                            speakerBtn.innerHTML = '🔊';
+                            speakerBtn.disabled = false;
+                            URL.revokeObjectURL(audioUrl);
+                        };
+                        
+                        audio.onerror = () => {
+                            console.log('Audio playback failed, trying fallback');
+                            useBrowserTTS(text, speakerBtn);
+                        };
+                        
+                        await audio.play();
+                    } catch (playError) {
+                        console.log('Audio processing failed:', playError);
+                        useBrowserTTS(text, speakerBtn);
                     }
-                    const audioBlob = new Blob([audioArray], { type: 'audio/mp3' });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const audio = new Audio(audioUrl);
-                    audio.play();
-                    audio.onended = () => {
-                        speakerBtn.innerHTML = '🔊';
-                        speakerBtn.disabled = false;
-                    };
+                } else if (data.error) {
+                    console.log('TTS API error:', data.error);
+                    useBrowserTTS(text, speakerBtn);
                 } else {
-                    throw new Error('No audio data');
+                    throw new Error('No audio data received');
                 }
             } catch (error) {
-                console.log('Using browser TTS fallback');
-                // Fallback to browser TTS
+                console.log('TTS fetch error, using browser fallback:', error);
+                useBrowserTTS(text, speakerBtn);
+            }
+        }
+        
+        function useBrowserTTS(text, speakerBtn) {
+            // Fallback to browser TTS with a nice voice
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                speechSynthesis.cancel();
+                
                 const utterance = new SpeechSynthesisUtterance(text);
                 utterance.lang = currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
-                utterance.rate = 0.9;
-                utterance.pitch = 0.9;
+                utterance.rate = 0.85; // Slightly slower for wisdom
+                utterance.pitch = 0.95; // Slightly lower for gravitas
+                
+                // Try to find a good voice
+                const voices = speechSynthesis.getVoices();
+                const preferredVoice = voices.find(v => 
+                    (currentLanguageMode === 'he' && v.lang.includes('he')) ||
+                    (currentLanguageMode === 'en' && (v.name.includes('Daniel') || v.name.includes('David') || v.name.includes('Male')))
+                );
+                if (preferredVoice) utterance.voice = preferredVoice;
+                
                 utterance.onend = () => {
                     speakerBtn.innerHTML = '🔊';
                     speakerBtn.disabled = false;
                 };
+                
+                utterance.onerror = () => {
+                    speakerBtn.innerHTML = '🔊';
+                    speakerBtn.disabled = false;
+                };
+                
                 speechSynthesis.speak(utterance);
+            } else {
+                speakerBtn.innerHTML = '🔊';
+                speakerBtn.disabled = false;
+                alert('Text-to-speech is not supported in your browser.');
             }
         }
 
@@ -3848,6 +3928,118 @@
         // Daily widget functions removed - using Rabbi chat and Translation only
 
         // ═══════════════════════════════════════════════════════════════
+        // 📜 TORAH PORTION - Weekly Parasha with Deep Teaching
+        // ═══════════════════════════════════════════════════════════════
+        async function loadTorahPortion() {
+            // Show loading message
+            addMessageToChat('rabbi', '📜 Let me find this week\'s Torah portion and prepare a deep teaching for you...');
+            showTypingIndicator();
+            
+            try {
+                // Step 1: Get current parasha from Hebcal API
+                const today = new Date();
+                const hebcalUrl = `https://www.hebcal.com/hebcal?v=1&cfg=json&maj=on&min=on&mod=on&nx=on&year=${today.getFullYear()}&month=x&ss=on&mf=on&c=on&geo=geoname&geonameid=5128581&M=on&s=on`;
+                
+                let parashaName = '';
+                let parashaHebrew = '';
+                let parashaDate = '';
+                
+                try {
+                    const hebcalResponse = await fetch(hebcalUrl);
+                    const hebcalData = await hebcalResponse.json();
+                    
+                    // Find the nearest Shabbat parasha
+                    const parashaItems = hebcalData.items.filter(item => 
+                        item.category === 'parashat' || item.title.includes('Parashat')
+                    );
+                    
+                    if (parashaItems.length > 0) {
+                        // Get the next upcoming or current parasha
+                        const now = new Date();
+                        const upcomingParasha = parashaItems.find(p => new Date(p.date) >= now) || parashaItems[0];
+                        parashaName = upcomingParasha.title.replace('Parashat ', '');
+                        parashaHebrew = upcomingParasha.hebrew || '';
+                        parashaDate = new Date(upcomingParasha.date).toLocaleDateString('en-US', { 
+                            weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
+                        });
+                    }
+                } catch (hebcalError) {
+                    console.log('Hebcal API error, will search for current parasha:', hebcalError);
+                }
+                
+                // Step 2: Ask Rabbi for deep teaching using web search
+                const torahPrompt = parashaName 
+                    ? `Please provide a comprehensive teaching on this week's Torah portion: Parashat ${parashaName} ${parashaHebrew ? '(' + parashaHebrew + ')' : ''}.
+                    
+Include:
+1. **The Portion Overview**: What chapters/verses does this parasha cover and what is the main narrative?
+2. **Key Stories & Events**: Summarize the major events and characters
+3. **Deep Spiritual Insights**: What are the deeper meanings and lessons? Include insights from classical commentators (Rashi, Ramban, etc.)
+4. **Practical Life Lessons**: How does this apply to our daily lives, especially for someone in retirement seeking meaning?
+5. **Connection to Jewish Values**: How does this portion connect to chesed, tikkun olam, or other Jewish values?
+6. **A Blessing**: End with an appropriate blessing or reflection
+
+Please search for accurate information about this specific Torah portion and provide a rich, meaningful teaching as if delivering a Shabbat sermon.`
+                    : `Please tell me about this week's Torah portion (Parashat HaShavua). Search for what the current parasha is, then provide:
+1. The name of the portion and what it covers
+2. Key stories and events
+3. Deep spiritual insights from commentators
+4. Practical life lessons for someone seeking meaning in retirement
+5. A meaningful blessing
+
+Please search Jewish sources for accurate, current information.`;
+
+                const response = await fetch('/.netlify/functions/rabbi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: torahPrompt,
+                        conversationHistory: [],
+                        language: currentLanguageMode
+                    })
+                });
+
+                hideTypingIndicator();
+                
+                // Remove the loading message
+                const messages = document.querySelectorAll('.rabbi-message.rabbi');
+                const lastMsg = messages[messages.length - 1];
+                if (lastMsg && lastMsg.textContent.includes('Let me find this week')) {
+                    lastMsg.remove();
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    addMessageToChat('rabbi', '📜 I apologize, but I had trouble retrieving the Torah portion teaching. Please try again in a moment.');
+                } else {
+                    // Add header if we know the parasha name
+                    let header = '';
+                    if (parashaName) {
+                        header = `📜 **This Week's Torah Portion**\n\n**Parashat ${parashaName}** ${parashaHebrew ? '(' + parashaHebrew + ')' : ''}\n${parashaDate ? '📅 ' + parashaDate : ''}\n\n---\n\n`;
+                    }
+                    addMessageToChat('rabbi', header + data.response);
+                    
+                    // Add to conversation history
+                    rabbiConversationHistory.push({ role: 'user', content: 'Tell me about this week\'s Torah portion' });
+                    rabbiConversationHistory.push({ role: 'assistant', content: data.response });
+                }
+            } catch (error) {
+                hideTypingIndicator();
+                console.error('Torah portion error:', error);
+                
+                // Remove the loading message
+                const messages = document.querySelectorAll('.rabbi-message.rabbi');
+                const lastMsg = messages[messages.length - 1];
+                if (lastMsg && lastMsg.textContent.includes('Let me find this week')) {
+                    lastMsg.remove();
+                }
+                
+                addMessageToChat('rabbi', '📜 I apologize, but I encountered an error while preparing the Torah teaching. Please check your connection and try again.');
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
         // 🎯 PATHWAY QUIZ
         // ═══════════════════════════════════════════════════════════════
         const quizQuestions = [
@@ -3916,220 +4108,4 @@
                     { text: "Visiting and helping isolated seniors", value: "chesed" },
                     { text: "Serving on Jewish organization boards", value: "leadership" },
                     { text: "Teaching and mentoring youth", value: "mentorship" },
-                    { text: "Working on Jewish genealogy projects", value: "memory" }
-                ]
-            },
-            {
-                question: "What legacy do you most want to leave?",
-                options: [
-                    { text: "Wisdom passed to the next generation", value: "mentorship" },
-                    { text: "Lives saved and people healed", value: "chesed" },
-                    { text: "Preserved family and community history", value: "memory" },
-                    { text: "Institutions strengthened and improved", value: "leadership" },
-                    { text: "Torah knowledge shared with others", value: "torah" }
-                ]
-            }
-        ];
-
-        let currentQuizQuestion = 0;
-        let quizAnswers = {};
-
-        function openPathwayQuiz() {
-            document.getElementById('quizOverlay').classList.add('open');
-            currentQuizQuestion = 0;
-            quizAnswers = {};
-            renderQuizQuestion();
-        }
-
-        function closeQuiz() {
-            document.getElementById('quizOverlay').classList.remove('open');
-        }
-
-        function renderQuizQuestion() {
-            const container = document.getElementById('quizContainer');
-            const q = quizQuestions[currentQuizQuestion];
-            const progress = ((currentQuizQuestion) / quizQuestions.length) * 100;
-
-            container.innerHTML = `
-                <h2>🎯 Discover Your Sacred Pathways</h2>
-                <p class="subtitle">Question ${currentQuizQuestion + 1} of ${quizQuestions.length}</p>
-                <div class="quiz-progress">
-                    <div class="quiz-progress-bar" style="width: ${progress}%"></div>
-                </div>
-                <div class="quiz-question">
-                    <h3>${q.question}</h3>
-                    <div class="quiz-options">
-                        ${q.options.map((opt, i) => `
-                            <div class="quiz-option ${quizAnswers[currentQuizQuestion] === i ? 'selected' : ''}" 
-                                 onclick="selectQuizOption(${i}, '${opt.value}')">
-                                ${opt.text}
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                <div class="quiz-nav">
-                    <button class="quiz-btn secondary" onclick="${currentQuizQuestion === 0 ? 'closeQuiz()' : 'prevQuizQuestion()'}">
-                        ${currentQuizQuestion === 0 ? '✕ Close' : '← Back'}
-                    </button>
-                    <button class="quiz-btn primary" onclick="nextQuizQuestion()" ${quizAnswers[currentQuizQuestion] === undefined ? 'disabled style="opacity:0.5"' : ''}>
-                        ${currentQuizQuestion === quizQuestions.length - 1 ? 'See My Pathways →' : 'Next →'}
-                    </button>
-                </div>
-            `;
-        }
-
-        function selectQuizOption(index, value) {
-            quizAnswers[currentQuizQuestion] = index;
-            quizAnswers[`q${currentQuizQuestion}_value`] = value;
-            renderQuizQuestion();
-        }
-
-        function prevQuizQuestion() {
-            if (currentQuizQuestion > 0) {
-                currentQuizQuestion--;
-                renderQuizQuestion();
-            }
-        }
-
-        function nextQuizQuestion() {
-            if (quizAnswers[currentQuizQuestion] === undefined) return;
-            
-            if (currentQuizQuestion < quizQuestions.length - 1) {
-                currentQuizQuestion++;
-                renderQuizQuestion();
-            } else {
-                submitQuiz();
-            }
-        }
-
-        async function submitQuiz() {
-            const container = document.getElementById('quizContainer');
-            container.innerHTML = `
-                <div style="text-align: center; padding: 3rem;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">🕎</div>
-                    <h2>Analyzing Your Answers...</h2>
-                    <p>Rabbi Moshe is reviewing your responses and consulting the wisdom of our tradition...</p>
-                    <div class="rabbi-typing" style="justify-content: center; margin-top: 2rem;">
-                        <span></span><span></span><span></span>
-                    </div>
-                </div>
-            `;
-
-            try {
-                const response = await fetch('/.netlify/functions/recommend', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ answers: quizAnswers })
-                });
-
-                const data = await response.json();
-                displayQuizResults(data);
-            } catch (error) {
-                console.error('Quiz error:', error);
-                container.innerHTML = `
-                    <div style="text-align: center;">
-                        <h2>Oy Vey!</h2>
-                        <p>Something went wrong. Please try again.</p>
-                        <button class="quiz-btn primary" onclick="closeQuiz()">Close</button>
-                    </div>
-                `;
-            }
-        }
-
-        function displayQuizResults(data) {
-            const container = document.getElementById('quizContainer');
-            
-            let recommendationsHTML = '';
-            if (data.recommendations) {
-                data.recommendations.forEach(rec => {
-                    recommendationsHTML += `
-                        <div class="recommendation-card">
-                            <span class="rank">${rec.rank}</span>
-                            <h4>${rec.pathway}</h4>
-                            <span class="match-score">${rec.matchScore}% Match</span>
-                            <p style="margin-top: 1rem; clear: both;"><strong>${rec.category}</strong></p>
-                            <p>${rec.whyItFits}</p>
-                            <p style="background: rgba(107, 142, 35, 0.1); padding: 0.75rem; border-radius: 10px; margin-top: 0.5rem;">
-                                <strong>First Step:</strong> ${rec.firstStep}
-                            </p>
-                            <p style="font-style: italic; color: #666; margin-top: 0.5rem;">
-                                ✡️ ${rec.jewishConnection}
-                            </p>
-                        </div>
-                    `;
-                });
-            }
-
-            container.innerHTML = `
-                <div class="quiz-results">
-                    <h2>🕎 Your Sacred Pathways</h2>
-                    <p class="subtitle">Based on your answers, here are the pathways that resonate most with your soul...</p>
-                    
-                    ${data.rabbiMessage ? `
-                        <div style="background: var(--gradient-torah); color: white; padding: 1.5rem; border-radius: 15px; margin: 1.5rem 0; text-align: left;">
-                            <p style="margin: 0;"><strong>Rabbi Moshe says:</strong></p>
-                            <p style="margin: 0.5rem 0 0 0; font-style: italic;">"${data.rabbiMessage}"</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${recommendationsHTML}
-                    
-                    <div style="margin-top: 2rem;">
-                        <button class="quiz-btn secondary" onclick="openPathwayQuiz()">Retake Quiz</button>
-                        <button class="quiz-btn primary" onclick="closeQuiz()">Explore Pathways</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // ═══════════════════════════════════════════════════════════════
-        // 🚀 INITIALIZATION
-        // ═══════════════════════════════════════════════════════════════
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🕎 Jewish Renaissance AI Features Loaded');
-            
-            // Add quiz button to sidebar or welcome section
-            addQuizButton();
-        });
-
-        function addQuizButton() {
-            // Add a "Find My Path" button to the welcome section
-            const welcomeSection = document.getElementById('welcome');
-            if (welcomeSection) {
-                const valuesGrid = welcomeSection.querySelector('.values-grid');
-                if (valuesGrid) {
-                    const quizCard = document.createElement('div');
-                    quizCard.className = 'value-card';
-                    quizCard.style.cursor = 'pointer';
-                    quizCard.onclick = openPathwayQuiz;
-                    quizCard.innerHTML = `
-                        <h3 class="value-title">🎯 Find Your Sacred Pathways</h3>
-                        <p class="value-hebrew">גלה את דרכך</p>
-                        <p class="value-description">
-                            Take a short quiz to discover which of the 60 sacred pathways are the perfect match for your skills, interests, and soul. Rabbi Moshe will personally analyze your answers.
-                        </p>
-                        <div class="value-quote" style="background: var(--gradient-torah); color: white;">
-                            Click Here to Start Your Journey →
-                        </div>
-                    `;
-                    valuesGrid.appendChild(quizCard);
-                }
-            }
-        }
-
-        // Auto-resize textarea
-        document.addEventListener('input', function(e) {
-            if (e.target.id === 'rabbiInput') {
-                e.target.style.height = 'auto';
-                e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
-            }
-        });
-
-        console.log('✅ All AI features initialized');
-        console.log('🕎 Rabbi Moshe ben David is ready to assist');
-        console.log('🌟 Fullscreen mode available');
-        console.log('🎯 Pathway quiz ready');
-    </script>
-
-</body>
-</html>
+                 
