@@ -3488,7 +3488,7 @@
          🕎 RABBI MOSHE BEN DAVID - AI CHAT INTERFACE
          ═══════════════════════════════════════════════════════════════ -->
     <div class="rabbi-chat-container">
-        <button class="rabbi-toggle-btn" id="rabbiToggleBtn" title="Talk to Rabbi Moshe" onclick="window.toggleRabbiChat()">
+        <button class="rabbi-toggle-btn" id="rabbiToggleBtn" title="Talk to Rabbi Moshe">
             <svg viewBox="0 0 100 100" width="100%" height="100%">
                 <!-- Lubavitcher Rabbi illustration - black hat, white beard -->
                 <defs>
@@ -4501,10 +4501,15 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
         function initializeEventListeners() {
             console.log('🔗 Initializing event listeners...');
             
-            // Rabbi toggle buttons
+            // Rabbi toggle buttons - use window.toggleRabbiChat to ensure correct function
             const rabbiToggleBtn = document.getElementById('rabbiToggleBtn');
             if (rabbiToggleBtn) {
-                rabbiToggleBtn.addEventListener('click', toggleRabbiChat);
+                // Remove any existing onclick to avoid double-firing
+                rabbiToggleBtn.onclick = null;
+                rabbiToggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    window.toggleRabbiChat();
+                });
                 console.log('✅ Rabbi toggle button connected');
             } else {
                 console.error('❌ Rabbi toggle button not found!');
@@ -4512,7 +4517,11 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
             
             const rabbiCloseBtn = document.getElementById('rabbiCloseBtn');
             if (rabbiCloseBtn) {
-                rabbiCloseBtn.addEventListener('click', toggleRabbiChat);
+                rabbiCloseBtn.onclick = null;
+                rabbiCloseBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    window.toggleRabbiChat();
+                });
             }
             
             // Fullscreen button
