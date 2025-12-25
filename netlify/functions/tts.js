@@ -1,5 +1,5 @@
 // Rabbi Moshe Text-to-Speech Function
-// Uses Gemini 2.5 Flash TTS for beautiful, expressive Rabbi voice
+// Uses Gemini 2.5 Flash TTS and converts L16 PCM to WAV
 
 exports.handler = async (event, context) => {
     // Handle CORS preflight
@@ -30,7 +30,7 @@ exports.handler = async (event, context) => {
         return {
             statusCode: 500,
             headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ error: 'API key not configured' })
+            body: JSON.stringify({ error: 'API key not configured', fallback: true })
         };
     }
 
@@ -45,15 +45,15 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Limit text length to avoid API issues
-        const truncatedText = text.substring(0, 1500);
+        // Limit text length
+        const truncatedText = text.substring(0, 800);
         
-        // Style prompt for wise, warm elderly rabbi voice
-        const stylePrompt = language === 'he' 
-            ? `Speak as a warm, wise elderly rabbi in his 70s with a gentle Israeli accent. Your voice should be fatherly, patient, and full of wisdom. Pace should be measured and thoughtful, with natural pauses for emphasis. Convey warmth and deep caring in every word.`
-            : `Speak as a warm, wise elderly rabbi in his 70s. Your voice should be gentle, fatherly, and full of ancient wisdom. Pace should be measured and thoughtful, with appropriate pauses for emphasis. You have a slight Eastern European Jewish accent - warm and comforting. Convey deep caring and patience in every word, like a loving grandfather sharing wisdom.`;
+        // Style prompt for wise rabbi voice
+        const voicePrompt = language === 'he' 
+            ? `Speak warmly as an elderly rabbi: "${truncatedText}"`
+            : `Speak as a warm, wise elderly rabbi with gentle pace: "${truncatedText}"`;
 
-        // Try Gemini 2.5 Flash TTS (most reliable for TTS)
+        // Try Gemini 2.5 Flash TTS
         const response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${GEMINI_API_KEY}`,
             {
@@ -61,14 +61,14 @@ exports.handler = async (event, context) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     contents: [{
-                        parts: [{ text: `${stylePrompt}\n\nSpeak the following text:\n"${truncatedText}"` }]
+                        parts: [{ text: voicePrompt }]
                     }],
                     generationConfig: {
                         responseModalities: ['AUDIO'],
                         speechConfig: {
                             voiceConfig: {
                                 prebuiltVoiceConfig: {
-                                    voiceName: 'Charon' // Deep, warm, wise male voice
+                                    voiceName: 'Kore' // Clear, warm voice
                                 }
                             }
                         }
@@ -79,33 +79,55 @@ exports.handler = async (event, context) => {
 
         const data = await response.json();
         
-        console.log('TTS API response status:', response.status);
+        console.log('TTS API status:', response.status);
         
         if (data.error) {
-            console.error('Gemini TTS error:', data.error);
+            console.error('Gemini TTS error:', data.error.message);
             return {
-                statusCode: 500,
+                statusCode: 200,
                 headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify({ 
-                    error: data.error.message || 'TTS generation failed',
-                    fallback: true
-                })
+                body: JSON.stringify({ error: data.error.message, fallback: true })
             };
         }
 
         // Extract audio data
         const audioData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-        const mimeType = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || 'audio/wav';
+        const mimeType = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || '';
         
         if (!audioData) {
             console.error('No audio data in response');
             return {
-                statusCode: 500,
+                statusCode: 200,
                 headers: { 'Access-Control-Allow-Origin': '*' },
                 body: JSON.stringify({ error: 'No audio generated', fallback: true })
             };
         }
 
+        console.log('Audio mimeType:', mimeType);
+        
+        // If it's L16 PCM format, convert to WAV
+        if (mimeType.includes('L16') || mimeType.includes('pcm')) {
+            // Decode base64 to binary
+            const pcmBuffer = Buffer.from(audioData, 'base64');
+            
+            // Create WAV header for 24kHz, 16-bit, mono PCM
+            const wavBuffer = addWavHeader(pcmBuffer, 24000, 16, 1);
+            
+            // Return as base64 WAV
+            return {
+                statusCode: 200,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ 
+                    audio: wavBuffer.toString('base64'),
+                    mimeType: 'audio/wav'
+                })
+            };
+        }
+
+        // Return as-is if already in a playable format
         return {
             statusCode: 200,
             headers: {
@@ -114,16 +136,48 @@ exports.handler = async (event, context) => {
             },
             body: JSON.stringify({ 
                 audio: audioData,
-                mimeType: mimeType
+                mimeType: mimeType || 'audio/wav'
             })
         };
 
     } catch (error) {
         console.error('TTS Function error:', error);
         return {
-            statusCode: 500,
+            statusCode: 200,
             headers: { 'Access-Control-Allow-Origin': '*' },
             body: JSON.stringify({ error: error.message, fallback: true })
         };
     }
 };
+
+// Function to add WAV header to raw PCM data
+function addWavHeader(pcmData, sampleRate, bitsPerSample, numChannels) {
+    const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+    const blockAlign = numChannels * (bitsPerSample / 8);
+    const dataSize = pcmData.length;
+    const headerSize = 44;
+    const fileSize = headerSize + dataSize - 8;
+    
+    const header = Buffer.alloc(headerSize);
+    
+    // RIFF header
+    header.write('RIFF', 0);
+    header.writeUInt32LE(fileSize, 4);
+    header.write('WAVE', 8);
+    
+    // fmt chunk
+    header.write('fmt ', 12);
+    header.writeUInt32LE(16, 16); // fmt chunk size
+    header.writeUInt16LE(1, 20); // audio format (1 = PCM)
+    header.writeUInt16LE(numChannels, 22);
+    header.writeUInt32LE(sampleRate, 24);
+    header.writeUInt32LE(byteRate, 28);
+    header.writeUInt16LE(blockAlign, 32);
+    header.writeUInt16LE(bitsPerSample, 34);
+    
+    // data chunk
+    header.write('data', 36);
+    header.writeUInt32LE(dataSize, 40);
+    
+    return Buffer.concat([header, pcmData]);
+}
