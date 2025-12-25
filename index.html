@@ -3577,12 +3577,6 @@
                 <button class="rabbi-tool-btn torah-portion-btn" id="torahPortionBtn" title="This week's Torah portion" onclick="window.loadTorahPortion()">
                     📜 Parasha
                 </button>
-                <div class="rabbi-speed-toggle" style="display:flex;align-items:center;gap:4px;margin-left:auto;padding-left:8px;border-left:1px solid rgba(184,134,11,0.3);">
-                    <span style="font-size:0.7rem;color:#666;">🔊</span>
-                    <button class="rabbi-speed-btn" onclick="window.setSpeechSpeed(0.7)" title="Slow speech" style="width:26px;height:22px;border:1px solid rgba(184,134,11,0.3);background:white;border-radius:4px;cursor:pointer;font-size:0.65rem;color:#666;">🐢</button>
-                    <button class="rabbi-speed-btn active" onclick="window.setSpeechSpeed(1.0)" title="Normal speed" style="width:26px;height:22px;border:1px solid #0F52BA;background:#0F52BA;color:white;border-radius:4px;cursor:pointer;font-size:0.65rem;">1x</button>
-                    <button class="rabbi-speed-btn" onclick="window.setSpeechSpeed(1.4)" title="Fast speech" style="width:26px;height:22px;border:1px solid rgba(184,134,11,0.3);background:white;border-radius:4px;cursor:pointer;font-size:0.65rem;color:#666;">🐇</button>
-                </div>
             </div>
             
             <div class="rabbi-messages" id="rabbiMessages">
@@ -3756,41 +3750,9 @@
         let isRecording = false;
         let mediaRecorder = null;
         let speechRecognition = null;
-        
-        // Stop Rabbi generation (abort in-progress API calls)
-        window.stopRabbiGeneration = function() {
-            console.log('🛑 stopRabbiGeneration called');
-            if (window.rabbiAbortController) {
-                window.rabbiAbortController.abort();
-                window.rabbiAbortController = null;
-            }
-            // Remove loading indicators
-            const loadingMsg = document.getElementById('parshaLoadingMsg');
-            if (loadingMsg) loadingMsg.remove();
-            const loadingIndicator = document.getElementById('parshaLoadingIndicator');
-            if (loadingIndicator) loadingIndicator.remove();
-            const typingIndicator = document.getElementById('typingIndicator');
-            if (typingIndicator) typingIndicator.remove();
-            
-            // Add cancelled message
-            const messagesDiv = document.getElementById('rabbiMessages');
-            if (messagesDiv) {
-                const cancelDiv = document.createElement('div');
-                cancelDiv.className = 'rabbi-message rabbi';
-                cancelDiv.innerHTML = '<p><em>Generation stopped.</em></p>';
-                messagesDiv.appendChild(cancelDiv);
-            }
-        };
 
-        // Define GLOBALLY on window object to ensure availability
-        window.toggleRabbiChat = function() {
-            console.log('🕎 toggleRabbiChat CALLED!');
-            const chatWindow = document.getElementById('rabbiChatWindow');
-            chatWindow.classList.toggle('open');
-            if (chatWindow.classList.contains('open')) {
-                document.getElementById('rabbiInput').focus();
-            }
-        }
+        // toggleRabbiChat is defined in early script block - DO NOT REDEFINE HERE
+        // (The early script version has the forced display:flex which is required)
 
         function toggleRabbiFullscreen() {
             const chatWindow = document.getElementById('rabbiChatWindow');
@@ -3994,115 +3956,58 @@
                     audio.onerror = (e) => {
                         console.log('Audio playback error:', e);
                         URL.revokeObjectURL(audioUrl);
-                        useBrowserTTS(text, speakerBtn, messageElement);
+                        useBrowserTTS(text, speakerBtn);
                     };
                     
                     await audio.play();
                 } catch (playError) {
                     console.log('Audio processing failed:', playError);
-                    useBrowserTTS(text, speakerBtn, messageElement);
+                    useBrowserTTS(text, speakerBtn);
                 }
             } catch (error) {
                 console.log('TTS fetch error:', error);
-                useBrowserTTS(text, speakerBtn, messageElement);
+                useBrowserTTS(text, speakerBtn);
             }
         }
         
-        // Speech speed control (0.7=slow, 1.0=normal, 1.4=fast)
-        window.rabbiSpeechRate = 1.0;
-        window.rabbiSpeechQueue = [];
-        window.rabbiIsSpeaking = false;
-        window.rabbiCurrentSpeakerBtn = null;
-        window.rabbiCurrentMessageEl = null;
-        
-        window.setSpeechSpeed = function(speed) {
-            window.rabbiSpeechRate = speed;
-            document.querySelectorAll('.rabbi-speed-btn').forEach(function(btn) { btn.classList.remove('active'); });
-            if (event && event.target) event.target.classList.add('active');
-            console.log('🔊 Speech speed set to:', speed);
-        };
-        
-        window.stopSpeech = function() {
-            speechSynthesis.cancel();
-            window.rabbiSpeechQueue = [];
-            window.rabbiIsSpeaking = false;
-            if (window.rabbiCurrentSpeakerBtn) {
-                window.rabbiCurrentSpeakerBtn.innerHTML = '🔊';
-                window.rabbiCurrentSpeakerBtn.disabled = false;
-                if (window.rabbiCurrentMessageEl) {
-                    window.rabbiCurrentSpeakerBtn.onclick = function() { window.speakMessage(window.rabbiCurrentMessageEl); };
-                }
-            }
-            console.log('🔇 Speech stopped');
-        };
-        
-        function splitIntoChunks(text, maxLength) {
-            maxLength = maxLength || 200;
-            var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-            var chunks = [];
-            var currentChunk = '';
-            for (var i = 0; i < sentences.length; i++) {
-                if (currentChunk.length + sentences[i].length <= maxLength) {
-                    currentChunk += sentences[i];
-                } else {
-                    if (currentChunk) chunks.push(currentChunk.trim());
-                    currentChunk = sentences[i];
-                }
-            }
-            if (currentChunk) chunks.push(currentChunk.trim());
-            return chunks;
-        }
-        
-        function speakChunk(text, onEnd) {
-            var utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
-            utterance.rate = window.rabbiSpeechRate;
-            utterance.pitch = 0.9;
-            var voices = speechSynthesis.getVoices();
-            var preferredVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David'))) || voices.find(v => v.lang.startsWith('en'));
-            if (preferredVoice) utterance.voice = preferredVoice;
-            utterance.onend = onEnd;
-            utterance.onerror = onEnd;
-            speechSynthesis.speak(utterance);
-        }
-        
-        function processSpeechQueue() {
-            if (window.rabbiSpeechQueue.length === 0) {
-                window.rabbiIsSpeaking = false;
-                if (window.rabbiCurrentSpeakerBtn) {
-                    window.rabbiCurrentSpeakerBtn.innerHTML = '🔊';
-                    window.rabbiCurrentSpeakerBtn.disabled = false;
-                    if (window.rabbiCurrentMessageEl) {
-                        window.rabbiCurrentSpeakerBtn.onclick = function() { window.speakMessage(window.rabbiCurrentMessageEl); };
-                    }
-                }
-                return;
-            }
-            var chunk = window.rabbiSpeechQueue.shift();
-            speakChunk(chunk, processSpeechQueue);
-        }
-        
-        function useBrowserTTS(text, speakerBtn, messageElement) {
+        function useBrowserTTS(text, speakerBtn) {
             if ('speechSynthesis' in window) {
                 speechSynthesis.cancel();
-                window.rabbiSpeechQueue = [];
                 
-                // Store references for stop functionality
-                window.rabbiCurrentSpeakerBtn = speakerBtn;
-                window.rabbiCurrentMessageEl = messageElement;
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
+                utterance.rate = 0.85;
+                utterance.pitch = 0.9;
                 
-                // Change button to stop
-                speakerBtn.innerHTML = '⏹️ Stop';
-                speakerBtn.disabled = false;
-                speakerBtn.onclick = function() { window.stopSpeech(); };
+                // Try to find a good voice
+                const voices = speechSynthesis.getVoices();
+                if (voices.length === 0) {
+                    // Voices not loaded yet, wait and try again
+                    speechSynthesis.onvoiceschanged = () => {
+                        const newVoices = speechSynthesis.getVoices();
+                        const preferredVoice = newVoices.find(v => 
+                            v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'))
+                        ) || newVoices.find(v => v.lang.startsWith('en'));
+                        if (preferredVoice) utterance.voice = preferredVoice;
+                    };
+                } else {
+                    const preferredVoice = voices.find(v => 
+                        v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'))
+                    ) || voices.find(v => v.lang.startsWith('en'));
+                    if (preferredVoice) utterance.voice = preferredVoice;
+                }
                 
-                // Split into chunks to avoid 35-second cutoff
-                var chunks = splitIntoChunks(text, 200);
-                console.log('🔊 Speaking ' + chunks.length + ' chunks at speed ' + window.rabbiSpeechRate);
+                utterance.onend = () => {
+                    speakerBtn.innerHTML = '🔊';
+                    speakerBtn.disabled = false;
+                };
                 
-                window.rabbiSpeechQueue = chunks;
-                window.rabbiIsSpeaking = true;
-                processSpeechQueue();
+                utterance.onerror = () => {
+                    speakerBtn.innerHTML = '🔊';
+                    speakerBtn.disabled = false;
+                };
+                
+                speechSynthesis.speak(utterance);
             } else {
                 speakerBtn.innerHTML = '🔊';
                 speakerBtn.disabled = false;
@@ -4117,59 +4022,16 @@
         // 🔲 FULLSCREEN TOGGLE
         // ═══════════════════════════════════════════════════════════════
         function toggleFullscreen() {
-            console.log('⛶ toggleFullscreen called');
             const chatWindow = document.getElementById('rabbiChatWindow');
             const fullscreenBtn = document.getElementById('fullscreenBtn');
-            const toggleBtn = document.getElementById('rabbiToggleBtn');
-            
-            if (!chatWindow) {
-                console.error('Chat window not found');
-                return;
-            }
-            
-            chatWindow.classList.toggle('fullscreen');
-            
-            if (chatWindow.classList.contains('fullscreen')) {
-                // Going fullscreen - force all properties
-                chatWindow.style.setProperty('position', 'fixed', 'important');
-                chatWindow.style.setProperty('top', '0', 'important');
-                chatWindow.style.setProperty('left', '0', 'important');
-                chatWindow.style.setProperty('right', '0', 'important');
-                chatWindow.style.setProperty('bottom', '0', 'important');
-                chatWindow.style.setProperty('width', '100vw', 'important');
-                chatWindow.style.setProperty('height', '100vh', 'important');
-                chatWindow.style.setProperty('max-height', '100vh', 'important');
-                chatWindow.style.setProperty('border-radius', '0', 'important');
-                chatWindow.style.setProperty('z-index', '100000', 'important');
+            if (chatWindow) {
+                chatWindow.classList.toggle('fullscreen');
                 if (fullscreenBtn) {
-                    fullscreenBtn.innerHTML = '⛶';
-                    fullscreenBtn.title = 'Exit fullscreen';
+                    fullscreenBtn.innerHTML = chatWindow.classList.contains('fullscreen') ? '⛶' : '⛶';
+                    fullscreenBtn.title = chatWindow.classList.contains('fullscreen') ? 'Exit fullscreen' : 'Expand to fullscreen';
                 }
-                if (toggleBtn) toggleBtn.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-            } else {
-                // Exiting fullscreen - restore normal position
-                chatWindow.style.setProperty('position', 'fixed', 'important');
-                chatWindow.style.setProperty('bottom', '100px', 'important');
-                chatWindow.style.setProperty('right', '20px', 'important');
-                chatWindow.style.removeProperty('top');
-                chatWindow.style.removeProperty('left');
-                chatWindow.style.setProperty('width', '420px', 'important');
-                chatWindow.style.setProperty('height', '600px', 'important');
-                chatWindow.style.setProperty('max-height', 'calc(100vh - 140px)', 'important');
-                chatWindow.style.setProperty('border-radius', '25px', 'important');
-                chatWindow.style.setProperty('z-index', '999999', 'important');
-                if (fullscreenBtn) {
-                    fullscreenBtn.innerHTML = '⛶';
-                    fullscreenBtn.title = 'Expand to fullscreen';
-                }
-                if (toggleBtn) toggleBtn.style.display = 'flex';
-                document.body.style.overflow = '';
+                console.log('Fullscreen toggled:', chatWindow.classList.contains('fullscreen'));
             }
-            
-            const input = document.getElementById('rabbiInput');
-            if (input) input.focus();
-            console.log('Fullscreen toggled:', chatWindow.classList.contains('fullscreen'));
         }
         window.toggleFullscreen = toggleFullscreen;
         console.log('✅ toggleFullscreen is now:', typeof window.toggleFullscreen);
@@ -4553,33 +4415,17 @@
         // 📜 TORAH PORTION - Weekly Parasha with Deep Teaching
         // ═══════════════════════════════════════════════════════════════
         async function loadTorahPortion() {
-            console.log('📜 loadTorahPortion called');
-            const messagesDiv = document.getElementById('rabbiMessages');
-            
-            // Show loading message
-            const loadingMsg = document.createElement('div');
-            loadingMsg.className = 'rabbi-message rabbi';
-            loadingMsg.id = 'parshaLoadingMsg';
-            loadingMsg.innerHTML = '<p>📜 Let me prepare a comprehensive teaching on this week\'s Torah portion...</p>';
-            messagesDiv.appendChild(loadingMsg);
-            
-            // Show spinner with stop button
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'rabbi-loading-container';
-            loadingDiv.id = 'parshaLoadingIndicator';
-            loadingDiv.innerHTML = '<div class="rabbi-loading-spinner"><div class="rabbi-spinner"></div><span class="rabbi-loading-text">Rabbi Moshe is preparing a comprehensive Parsha teaching...</span></div><button class="rabbi-stop-btn" onclick="window.stopRabbiGeneration()">⏹️ Stop</button>';
-            messagesDiv.appendChild(loadingDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            
-            // Create abort controller
-            window.rabbiAbortController = new AbortController();
+            addMessageToChat('rabbi', '📜 Let me share this week\'s Torah portion and prepare a teaching for you, Dr. Goldstein...');
+            showTypingIndicator();
             
             try {
+                // Get today's date for context
                 const today = new Date();
                 const dateStr = today.toLocaleDateString('en-US', { 
                     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
                 });
                 
+                // Ask Rabbi directly for the Torah portion (he knows the calendar!)
                 const torahPrompt = `Today is ${dateStr}. Please provide a comprehensive teaching on this week's Torah portion (Parashat HaShavua).
 
 As Rabbi Moshe ben David, please include:
@@ -4601,15 +4447,17 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
                         message: torahPrompt,
                         conversationHistory: [],
                         language: currentLanguageMode
-                    }),
-                    signal: window.rabbiAbortController.signal
+                    })
                 });
 
-                // Remove loading elements
-                const loadingMsgEl = document.getElementById('parshaLoadingMsg');
-                if (loadingMsgEl) loadingMsgEl.remove();
-                const loadingIndicator = document.getElementById('parshaLoadingIndicator');
-                if (loadingIndicator) loadingIndicator.remove();
+                hideTypingIndicator();
+                
+                // Remove the loading message
+                const messages = document.querySelectorAll('.rabbi-message.rabbi');
+                const lastMsg = messages[messages.length - 1];
+                if (lastMsg && lastMsg.textContent.includes('Let me share this week')) {
+                    lastMsg.remove();
+                }
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}`);
@@ -4624,23 +4472,17 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
                     rabbiConversationHistory.push({ role: 'user', content: 'Tell me about this week\'s Torah portion' });
                     rabbiConversationHistory.push({ role: 'assistant', content: data.response });
                 }
-                
-                window.rabbiAbortController = null;
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    console.log('🛑 Parsha request was aborted');
-                    return;
-                }
-                
+                hideTypingIndicator();
                 console.error('Torah portion error:', error);
                 
-                const loadingMsgEl = document.getElementById('parshaLoadingMsg');
-                if (loadingMsgEl) loadingMsgEl.remove();
-                const loadingIndicator = document.getElementById('parshaLoadingIndicator');
-                if (loadingIndicator) loadingIndicator.remove();
+                const messages = document.querySelectorAll('.rabbi-message.rabbi');
+                const lastMsg = messages[messages.length - 1];
+                if (lastMsg && lastMsg.textContent.includes('Let me share this week')) {
+                    lastMsg.remove();
+                }
                 
                 addMessageToChat('rabbi', '📜 I apologize, but I encountered an error. Please check your connection and try again.');
-                window.rabbiAbortController = null;
             }
         }
         window.loadTorahPortion = loadTorahPortion;
