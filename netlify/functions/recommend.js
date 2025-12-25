@@ -1,50 +1,55 @@
-// Pathway Recommendation Function
-// Uses Gemini 2.5 Flash for quiz-based pathway recommendations
+// Netlify Serverless Function - Pathway Recommendation Quiz
+// Uses Gemini 2.5 Flash to analyze quiz answers and recommend pathways
 
 exports.handler = async (event, context) => {
   // CORS headers for all responses
-  const headers = {
+  const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     'Content-Type': 'application/json'
   };
 
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
+    return { statusCode: 204, headers: corsHeaders, body: '' };
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
+    return { 
+      statusCode: 405, 
+      headers: corsHeaders, 
+      body: JSON.stringify({ error: 'Method Not Allowed' }) 
+    };
+  }
+
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  
+  if (!GEMINI_API_KEY) {
+    return { 
+      statusCode: 500, 
+      headers: corsHeaders, 
+      body: JSON.stringify({ error: 'API key not configured' }) 
+    };
   }
 
   try {
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    
-    if (!GEMINI_API_KEY) {
-      console.error('GEMINI_API_KEY not set');
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'API key not configured' })
-      };
-    }
-
     const { answers } = JSON.parse(event.body);
     
     if (!answers || !Array.isArray(answers)) {
-      return {
-        statusCode: 400,
-        headers,
-        body: JSON.stringify({ error: 'Quiz answers are required' })
+      return { 
+        statusCode: 400, 
+        headers: corsHeaders, 
+        body: JSON.stringify({ error: 'Quiz answers array is required' }) 
       };
     }
 
-    const prompt = `Based on the following quiz answers from Dr. Stafford Goldstein, a 75-year-old retired gastroenterologist, recommend the top 5 pathways from the 60 sacred Jewish pathways for retirement fulfillment.
+    const prompt = `You are Rabbi Moshe ben David, analyzing quiz responses from Dr. Stafford Goldstein, a 75-year-old retired gastroenterologist seeking meaning in retirement through Jewish pathways.
+
+Based on the following quiz answers, recommend the top 5 pathways from the 60 sacred Jewish pathways for retirement fulfillment.
 
 Quiz Answers:
-${answers.map((a, i) => `Q${i+1}: ${a.question} - Answer: ${a.answer}`).join('\n')}
+${answers.map((a, i) => `Q${i+1}: ${a.question || 'Question'} - Answer: ${a.answer}`).join('\n')}
 
 Available Pathway Categories:
 1. Torah Study: Kollel learning, Jewish medical ethics, Daf Yomi, Pirkei Avot mastery
@@ -66,11 +71,12 @@ Format as JSON:
       "pathway": "Pathway name",
       "category": "Category",
       "matchScore": 95,
-      "reason": "Why this pathway matches based on their answers",
-      "firstStep": "Concrete first action to take"
+      "reason": "Why this pathway matches based on their answers (2-3 sentences)",
+      "firstStep": "Concrete first action to take",
+      "jewishWisdom": "A relevant Jewish teaching or proverb"
     }
   ],
-  "personalMessage": "A warm, encouraging message from Rabbi Moshe about their journey"
+  "personalMessage": "A warm, encouraging message from Rabbi Moshe about their journey (3-4 sentences)"
 }`;
 
     // Call Gemini 2.5 Flash API
@@ -91,18 +97,9 @@ Format as JSON:
 
     const data = await response.json();
     
-    console.log('Gemini API response status:', response.status);
-    
     if (!response.ok) {
       console.error('Gemini API error:', JSON.stringify(data));
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ 
-          error: 'API error', 
-          details: data.error?.message || 'Unknown error'
-        })
-      };
+      throw new Error(data.error?.message || 'Recommendation failed');
     }
 
     let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
@@ -120,15 +117,18 @@ Format as JSON:
 
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify(result)
+      headers: corsHeaders,
+      body: JSON.stringify({
+        ...result,
+        model: 'gemini-2.5-flash'
+      })
     };
 
   } catch (error) {
-    console.error('Function error:', error);
+    console.error('Recommendation error:', error);
     return {
       statusCode: 500,
-      headers,
+      headers: corsHeaders,
       body: JSON.stringify({ error: error.message })
     };
   }
