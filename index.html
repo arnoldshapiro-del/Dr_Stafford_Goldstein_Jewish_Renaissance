@@ -1126,6 +1126,194 @@
             color: #FFD700;
         }
         
+        /* ═══════════════════════════════════════════════════════════════
+           📚 TEACHING COURSES
+           ═══════════════════════════════════════════════════════════════ */
+        
+        .rabbi-courses {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+            border-bottom: 2px solid rgba(184, 134, 11, 0.5);
+        }
+        
+        .rabbi-courses-label {
+            font-size: 0.75rem;
+            color: #FFD700;
+            font-weight: bold;
+        }
+        
+        .rabbi-course-btn {
+            padding: 6px 12px;
+            border: 2px solid #FFD700;
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(218, 165, 32, 0.3) 100%);
+            border-radius: 15px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .rabbi-course-btn:hover {
+            background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+        }
+        
+        /* Yiddish Learning Panel */
+        .yiddish-panel {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #FEFDF8 0%, #FFF8DC 100%);
+            z-index: 20;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .yiddish-panel.open { display: flex; }
+        
+        .yiddish-header {
+            background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .yiddish-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+        
+        .yiddish-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: rgba(184, 134, 11, 0.1);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.3);
+        }
+        
+        .yiddish-progress-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(184, 134, 11, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .yiddish-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #B8860B, #FFD700);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+        
+        .yiddish-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .yiddish-word-card {
+            background: white;
+            border: 2px solid rgba(184, 134, 11, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .yiddish-word-card:hover {
+            border-color: #B8860B;
+            box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2);
+        }
+        
+        .yiddish-word {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #1a365d;
+            margin-bottom: 5px;
+        }
+        
+        .yiddish-transliteration {
+            font-size: 1.2rem;
+            color: #B8860B;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        
+        .yiddish-meaning {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        
+        .yiddish-example {
+            font-size: 0.9rem;
+            color: #777;
+            font-style: italic;
+            padding: 10px;
+            background: rgba(184, 134, 11, 0.05);
+            border-radius: 10px;
+        }
+        
+        .yiddish-speak-btn {
+            margin-top: 15px;
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .yiddish-speak-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+        }
+        
+        .yiddish-nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px;
+            background: rgba(26, 54, 93, 0.05);
+            border-top: 1px solid rgba(184, 134, 11, 0.2);
+        }
+        
+        .yiddish-nav-btn {
+            padding: 10px 20px;
+            border: 2px solid #1a365d;
+            background: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .yiddish-nav-btn:hover {
+            background: #1a365d;
+            color: white;
+        }
+        
+        .yiddish-nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
         /* Message Action Buttons */
         .rabbi-message-actions {
             display: flex;
@@ -3988,6 +4176,14 @@
                 </div>
             </div>
             
+            <!-- Teaching Courses -->
+            <div class="rabbi-courses">
+                <span class="rabbi-courses-label">📚 Courses:</span>
+                <button class="rabbi-course-btn" onclick="window.openCourse('parsha')" title="Weekly Torah Portion">📜 Parsha Study</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('talmud')" title="Talmudic Wisdom">📖 Talmud Insights</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('yiddish')" title="Learn 200 Yiddish Words">🗣️ Learn Yiddish</button>
+            </div>
+            
             <!-- Suggested Prompts -->
             <div class="rabbi-suggestions" id="rabbiSuggestions">
                 <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What does the Torah teach about finding purpose in retirement?')">🎯 Purpose in Retirement</button>
@@ -4023,6 +4219,28 @@
                 </div>
                 <div class="rabbi-saved-list" id="rabbiSavedList">
                     <!-- Saved messages will appear here -->
+                </div>
+            </div>
+            
+            <!-- Yiddish Learning Panel -->
+            <div class="yiddish-panel" id="yiddishPanel">
+                <div class="yiddish-header">
+                    <h3>🗣️ Learn Yiddish with Rabbi Moshe</h3>
+                    <button onclick="window.closeYiddishPanel()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">✕</button>
+                </div>
+                <div class="yiddish-progress">
+                    <span id="yiddishWordNum">Word 1 of 200</span>
+                    <div class="yiddish-progress-bar">
+                        <div class="yiddish-progress-fill" id="yiddishProgressFill" style="width: 0.5%"></div>
+                    </div>
+                </div>
+                <div class="yiddish-content" id="yiddishContent">
+                    <!-- Word cards will be inserted here -->
+                </div>
+                <div class="yiddish-nav">
+                    <button class="yiddish-nav-btn" id="yiddishPrevBtn" onclick="window.prevYiddishWord()">← Previous</button>
+                    <button class="yiddish-nav-btn" onclick="window.randomYiddishWord()">🎲 Random</button>
+                    <button class="yiddish-nav-btn" id="yiddishNextBtn" onclick="window.nextYiddishWord()">Next →</button>
                 </div>
             </div>
         </div>
@@ -4130,6 +4348,304 @@
         // Close saved panel
         window.closeSavedPanel = function() {
             document.getElementById('rabbiSavedPanel').classList.remove('open');
+        };
+        
+        // ═══════════════════════════════════════════════════════════════
+        // 📚 TEACHING COURSES
+        // ═══════════════════════════════════════════════════════════════
+        
+        // 200 Yiddish Words and Phrases
+        window.yiddishWords = [
+            { word: "שלום", transliteration: "Shalom", meaning: "Hello, goodbye, peace", example: "Shalom aleichem! (Peace be upon you!)" },
+            { word: "מזל טוב", transliteration: "Mazel Tov", meaning: "Congratulations, good luck", example: "Mazel tov on your new grandchild!" },
+            { word: "חוצפּה", transliteration: "Chutzpah", meaning: "Audacity, nerve, gall", example: "The chutzpah of that man to cut in line!" },
+            { word: "קוועטש", transliteration: "Kvetch", meaning: "To complain, whine", example: "Stop kvetching about the weather already!" },
+            { word: "שמאָלץ", transliteration: "Schmaltz", meaning: "Excessive sentimentality, rendered chicken fat", example: "That movie was pure schmaltz." },
+            { word: "משוגענע", transliteration: "Meshuggeneh", meaning: "Crazy person", example: "He's acting like a total meshuggeneh!" },
+            { word: "נאָש", transliteration: "Nosh", meaning: "Snack, to snack", example: "Let's nosh on some rugelach." },
+            { word: "שמוץ", transliteration: "Schmutz", meaning: "Dirt, filth", example: "You have schmutz on your face." },
+            { word: "קיביץ", transliteration: "Kibitz", meaning: "To offer unwanted advice, to chat", example: "Stop kibitzing and let him play!" },
+            { word: "שלעפּ", transliteration: "Schlep", meaning: "To drag, carry with effort", example: "I had to schlep all these bags upstairs." },
+            { word: "שמאָווער", transliteration: "Schmooze", meaning: "To chat, network", example: "He loves to schmooze at parties." },
+            { word: "שפּילקעס", transliteration: "Shpilkes", meaning: "Nervous energy, ants in pants", example: "I have shpilkes waiting for the results." },
+            { word: "נחת", transliteration: "Nachas", meaning: "Pride and joy from children", example: "My grandchildren give me such nachas!" },
+            { word: "באָבע", transliteration: "Bubbe", meaning: "Grandmother", example: "My bubbe makes the best chicken soup." },
+            { word: "זיידע", transliteration: "Zayde", meaning: "Grandfather", example: "Zayde told me stories of the old country." },
+            { word: "מענטש", transliteration: "Mensch", meaning: "A person of integrity and honor", example: "He's a real mensch, always helping others." },
+            { word: "שטיק", transliteration: "Shtick", meaning: "A gimmick, routine", example: "That comedian has a great shtick." },
+            { word: "טאַכליס", transliteration: "Tachlis", meaning: "The bottom line, practical matters", example: "Let's talk tachlis - what's the price?" },
+            { word: "גליטש", transliteration: "Glitch", meaning: "A minor malfunction", example: "There's a glitch in the computer." },
+            { word: "שמענדריק", transliteration: "Schmendrick", meaning: "A foolish person", example: "Don't be such a schmendrick!" },
+            { word: "נודניק", transliteration: "Nudnik", meaning: "A pest, annoying person", example: "That nudnik won't stop calling me." },
+            { word: "קלוץ", transliteration: "Klutz", meaning: "A clumsy person", example: "I'm such a klutz, I dropped everything." },
+            { word: "שלימזל", transliteration: "Schlimazel", meaning: "Unlucky person", example: "Poor schlimazel, everything goes wrong for him." },
+            { word: "שלעמיל", transliteration: "Schlemiel", meaning: "A bungler, awkward person", example: "The schlemiel spills soup, the schlimazel gets it on him." },
+            { word: "נעביש", transliteration: "Nebbish", meaning: "A pitiful, weak person", example: "The poor nebbish couldn't stand up for himself." },
+            { word: "צאָרעס", transliteration: "Tsores", meaning: "Troubles, problems", example: "Oy, the tsores I've had this week!" },
+            { word: "אױ װײ", transliteration: "Oy Vey", meaning: "Exclamation of dismay", example: "Oy vey, what a disaster!" },
+            { word: "געפֿילטע פֿיש", transliteration: "Gefilte Fish", meaning: "Traditional Jewish fish dish", example: "Bubbe's gefilte fish is the best." },
+            { word: "לאָקשן", transliteration: "Lokshen", meaning: "Noodles", example: "Pass the lokshen kugel, please." },
+            { word: "קוגל", transliteration: "Kugel", meaning: "Baked pudding dish", example: "The potato kugel is delicious." },
+            { word: "בלינצעס", transliteration: "Blintzes", meaning: "Filled crepes", example: "She makes cheese blintzes for Shavuot." },
+            { word: "קנישׁ", transliteration: "Knish", meaning: "Stuffed pastry", example: "Get me a potato knish from the deli." },
+            { word: "באַגל", transliteration: "Bagel", meaning: "Ring-shaped bread", example: "I'll have a bagel with cream cheese." },
+            { word: "לאָקס", transliteration: "Lox", meaning: "Smoked salmon", example: "Lox and bagels for Sunday brunch." },
+            { word: "מצה", transliteration: "Matzah", meaning: "Unleavened bread", example: "We eat matzah during Passover." },
+            { word: "חלה", transliteration: "Challah", meaning: "Braided bread for Shabbat", example: "The challah is still warm from the oven." },
+            { word: "לאַטקע", transliteration: "Latke", meaning: "Potato pancake", example: "We make latkes for Chanukah." },
+            { word: "רוגעלאַך", transliteration: "Rugelach", meaning: "Crescent-shaped pastry", example: "The rugelach are filled with chocolate." },
+            { word: "האַמענטאַשׁן", transliteration: "Hamantaschen", meaning: "Triangular Purim cookies", example: "Hamantaschen with poppy seed filling." },
+            { word: "בריסקעט", transliteration: "Brisket", meaning: "Braised beef cut", example: "Mom's brisket melts in your mouth." },
+            { word: "שבת", transliteration: "Shabbos/Shabbat", meaning: "The Sabbath", example: "Good Shabbos! Have a peaceful rest." },
+            { word: "דאַװענען", transliteration: "Daven", meaning: "To pray", example: "He davens every morning." },
+            { word: "שול", transliteration: "Shul", meaning: "Synagogue", example: "We go to shul on Saturday." },
+            { word: "מצווה", transliteration: "Mitzvah", meaning: "Good deed, commandment", example: "Helping the elderly is a mitzvah." },
+            { word: "תּורה", transliteration: "Torah", meaning: "The Five Books of Moses", example: "We study Torah every week." },
+            { word: "תּלמוד", transliteration: "Talmud", meaning: "Rabbinic teachings", example: "The Talmud contains great wisdom." },
+            { word: "רב", transliteration: "Rav/Rabbi", meaning: "Teacher, religious leader", example: "Ask the rabbi for guidance." },
+            { word: "רביצין", transliteration: "Rebbetzin", meaning: "Rabbi's wife", example: "The rebbetzin hosts the class." },
+            { word: "ישׁיבֿה", transliteration: "Yeshiva", meaning: "Jewish school", example: "He studies at the yeshiva." },
+            { word: "בר מצווה", transliteration: "Bar Mitzvah", meaning: "Coming of age at 13", example: "My grandson's bar mitzvah is next month." },
+            { word: "בת מצווה", transliteration: "Bat Mitzvah", meaning: "Coming of age for girls", example: "She had a beautiful bat mitzvah." },
+            { word: "חתונה", transliteration: "Chasunah", meaning: "Wedding", example: "The chasunah was so joyful!" },
+            { word: "כּלה", transliteration: "Kallah", meaning: "Bride", example: "The kallah looked radiant." },
+            { word: "חתן", transliteration: "Chosson", meaning: "Groom", example: "The chosson broke the glass." },
+            { word: "שׁדכן", transliteration: "Shadchan", meaning: "Matchmaker", example: "The shadchan introduced them." },
+            { word: "באַשערט", transliteration: "Bashert", meaning: "Destined, soulmate", example: "She found her bashert." },
+            { word: "לחײם", transliteration: "L'chaim", meaning: "To life! (toast)", example: "L'chaim! May you live to 120!" },
+            { word: "יאָרצײַט", transliteration: "Yahrzeit", meaning: "Anniversary of death", example: "Today is my father's yahrzeit." },
+            { word: "שׁבֿעה", transliteration: "Shiva", meaning: "Seven days of mourning", example: "The family is sitting shiva." },
+            { word: "קדיש", transliteration: "Kaddish", meaning: "Mourner's prayer", example: "He says kaddish for his mother." },
+            { word: "זכרון", transliteration: "Zikaron", meaning: "Memory, remembrance", example: "Of blessed memory - zichrono livracha." },
+            { word: "גאָט", transliteration: "Got", meaning: "God", example: "Got tsu danken - Thank God." },
+            { word: "השׁם", transliteration: "Hashem", meaning: "God (literally 'The Name')", example: "Hashem will provide." },
+            { word: "בײַ מיר", transliteration: "Bei Mir", meaning: "By me, in my opinion", example: "Bei mir, this is the best!" },
+            { word: "געזונטהײַט", transliteration: "Gezuntheit", meaning: "Health, bless you", example: "Gezuntheit! Are you catching a cold?" },
+            { word: "קינד", transliteration: "Kind", meaning: "Child", example: "Such a sweet kind!" },
+            { word: "קינדער", transliteration: "Kinder", meaning: "Children", example: "The kinder are playing outside." },
+            { word: "טאַטע", transliteration: "Tatte", meaning: "Father", example: "Tatte, can you help me?" },
+            { word: "מאַמע", transliteration: "Mamme", meaning: "Mother", example: "Mamme knows best." },
+            { word: "משׁפּחה", transliteration: "Mishpocha", meaning: "Extended family", example: "The whole mishpocha is coming." },
+            { word: "לאַנדסמאַן", transliteration: "Landsman", meaning: "Fellow countryman", example: "He's a landsman from my village." },
+            { word: "הײמיש", transliteration: "Heimish", meaning: "Homey, warm, cozy", example: "Such a heimish atmosphere!" },
+            { word: "יידישׁקײַט", transliteration: "Yiddishkeit", meaning: "Jewish culture/tradition", example: "She embraces her Yiddishkeit." },
+            { word: "חכמה", transliteration: "Chochmah", meaning: "Wisdom", example: "The rabbi has great chochmah." },
+            { word: "שׂכל", transliteration: "Seychel", meaning: "Common sense", example: "Use your seychel!" },
+            { word: "בינה", transliteration: "Binah", meaning: "Understanding", example: "With binah comes patience." },
+            { word: "אמת", transliteration: "Emes", meaning: "Truth", example: "Tell me the emes." },
+            { word: "שׁלום בּית", transliteration: "Shalom Bayis", meaning: "Peace in the home", example: "Shalom bayis is most important." },
+            { word: "כּבֿוד", transliteration: "Kovod", meaning: "Honor, respect", example: "Show kovod to your elders." },
+            { word: "צדקה", transliteration: "Tzedakah", meaning: "Charity, righteousness", example: "Give tzedakah generously." },
+            { word: "חסד", transliteration: "Chesed", meaning: "Loving kindness", example: "Acts of chesed change the world." },
+            { word: "גמילות חסדים", transliteration: "Gemilut Chasadim", meaning: "Acts of loving kindness", example: "Visiting the sick is gemilut chasadim." },
+            { word: "תּיקון עולם", transliteration: "Tikkun Olam", meaning: "Repairing the world", example: "We work toward tikkun olam." },
+            { word: "פּיקוח נפֿשׁ", transliteration: "Pikuach Nefesh", meaning: "Saving a life", example: "Pikuach nefesh overrides Shabbat." },
+            { word: "דרך ארץ", transliteration: "Derech Eretz", meaning: "Proper behavior, manners", example: "Derech eretz comes before Torah." },
+            { word: "בּעל תּשׁובֿה", transliteration: "Baal Teshuva", meaning: "One who returns to faith", example: "He became a baal teshuva." },
+            { word: "פֿרום", transliteration: "Frum", meaning: "Religious, devout", example: "They are a frum family." },
+            { word: "גלות", transliteration: "Galut/Golus", meaning: "Exile, diaspora", example: "We remember the years of golus." },
+            { word: "אַלטע בּאָבע מעשׂה", transliteration: "Alte Bubbe Mayse", meaning: "Old wives' tale", example: "That's just an alte bubbe mayse!" },
+            { word: "גאַנצע מגילה", transliteration: "Gantse Megillah", meaning: "The whole story, big deal", example: "He told me the gantse megillah." },
+            { word: "האַק מיר נישׁט קײן טשׁײַניק", transliteration: "Hak Mir Nisht Keyn Tshaynik", meaning: "Don't bother me", example: "Stop hocking me a tshaynik!" },
+            { word: "זאָרג זיך נישׁט", transliteration: "Zorg Zikh Nisht", meaning: "Don't worry", example: "Zorg zikh nisht, everything will be fine." },
+            { word: "אַ שׁײנע דאַנק", transliteration: "A Sheyne Dank", meaning: "Many thanks", example: "A sheyne dank for your help!" },
+            { word: "זײַ געזונט", transliteration: "Zay Gezunt", meaning: "Be well", example: "Zay gezunt until we meet again!" },
+            { word: "גײ אין דרערד", transliteration: "Gay In Drerd", meaning: "Go to hell (literally 'to the ground')", example: "A colorful Yiddish curse!" },
+            { word: "גײ שׁלאָפֿן", transliteration: "Gay Shlofn", meaning: "Go to sleep", example: "It's late, gay shlofn!" },
+            { word: "עס געזונטערהײט", transliteration: "Es Gezunterhait", meaning: "Eat in good health", example: "Es gezunterhait, enjoy the meal!" },
+            { word: "װאָס מאַכסטו", transliteration: "Vos Machstu", meaning: "How are you? What's up?", example: "Vos machstu, my friend?" },
+            { word: "נישׁט געפֿערלעך", transliteration: "Nisht Geferlekh", meaning: "Not so bad, could be worse", example: "How am I? Nisht geferlekh." },
+            { word: "קײן עין הרע", transliteration: "Keyn Ayin Hara", meaning: "No evil eye (knock on wood)", example: "The children are healthy, keyn ayin hara." },
+            { word: "פּו פּו פּו", transliteration: "Pu Pu Pu", meaning: "Spitting to ward off evil eye", example: "She's so beautiful, pu pu pu!" },
+            { word: "בּשׂימחות", transliteration: "B'simchas", meaning: "At joyous occasions", example: "We should meet only b'simchas!" },
+            { word: "אם ירצה השׁם", transliteration: "Im Yirtzeh Hashem", meaning: "God willing", example: "Im yirtzeh Hashem, next year in Jerusalem!" },
+            { word: "בּעזרת השׁם", transliteration: "B'ezrat Hashem", meaning: "With God's help", example: "B'ezrat Hashem, we'll succeed." },
+            { word: "ברוך השׁם", transliteration: "Baruch Hashem", meaning: "Thank God, blessed be God", example: "How are you? Baruch Hashem!" },
+            { word: "חס ושׁלום", transliteration: "Chas V'shalom", meaning: "God forbid", example: "Chas v'shalom something bad should happen!" },
+            { word: "רחמנא ליצלן", transliteration: "Rachmana Litzlan", meaning: "May God protect us", example: "From such troubles, rachmana litzlan!" },
+            { word: "נישׁקושׁע", transliteration: "Nishkoshe", meaning: "Not bad, pretty good", example: "The kugel is nishkoshe." },
+            { word: "מסתּמא", transliteration: "Mistama", meaning: "Probably, presumably", example: "Mistama he got stuck in traffic." },
+            { word: "טאַקע", transliteration: "Takke", meaning: "Really, indeed", example: "You're takke right about that." },
+            { word: "אפֿשׁר", transliteration: "Efsher", meaning: "Maybe, perhaps", example: "Efsher we should go home." },
+            { word: "דאַװקע", transliteration: "Davka", meaning: "Specifically, on purpose", example: "He davka came late to annoy me." },
+            { word: "שׁוין", transliteration: "Shoyn", meaning: "Already", example: "It's time already? Shoyn?" },
+            { word: "נאָך", transliteration: "Nokh", meaning: "Still, yet, another", example: "Give me nokh a piece." },
+            { word: "גענוג", transliteration: "Genug", meaning: "Enough", example: "Genug already with the complaining!" },
+            { word: "ביסל", transliteration: "Bisl", meaning: "A little bit", example: "Just a bisl more soup." },
+            { word: "סך", transliteration: "Sakh", meaning: "A lot, many", example: "A sakh menschen came to the wedding." },
+            { word: "פּסק", transliteration: "Psak", meaning: "Decision, ruling", example: "The rabbi gave his psak." },
+            { word: "הלכה", transliteration: "Halacha", meaning: "Jewish law", example: "According to halacha, we must..." },
+            { word: "מנהג", transliteration: "Minhag", meaning: "Custom, tradition", example: "It's our family minhag." },
+            { word: "סגולה", transliteration: "Segulah", meaning: "Remedy, protective practice", example: "Challah baking is a segulah." },
+            { word: "ברכה", transliteration: "Bracha", meaning: "Blessing", example: "Give me a bracha, rabbi." },
+            { word: "עליה", transliteration: "Aliyah", meaning: "Going up, immigration to Israel", example: "He made aliyah last year." },
+            { word: "חילול השׁם", transliteration: "Chillul Hashem", meaning: "Desecration of God's name", example: "His behavior was a chillul Hashem." },
+            { word: "קידושׁ השׁם", transliteration: "Kiddush Hashem", meaning: "Sanctification of God's name", example: "Her kindness was a kiddush Hashem." },
+            { word: "לשׁון הרע", transliteration: "Lashon Hara", meaning: "Evil speech, gossip", example: "Don't speak lashon hara!" },
+            { word: "מוסר", transliteration: "Mussar", meaning: "Ethics, moral instruction", example: "He gives mussar lovingly." },
+            { word: "השׁגחה פּרטית", transliteration: "Hashgacha Pratis", meaning: "Divine providence", example: "It was hashgacha pratis we met." },
+            { word: "בּטחון", transliteration: "Bitachon", meaning: "Trust in God", example: "Have bitachon, it will work out." },
+            { word: "אמונה", transliteration: "Emunah", meaning: "Faith", example: "Her emunah is unshakeable." },
+            { word: "תּפֿילה", transliteration: "Tefillah", meaning: "Prayer", example: "Tefillah connects us to Hashem." },
+            { word: "כּװנה", transliteration: "Kavanah", meaning: "Intention, concentration", example: "Daven with kavanah." },
+            { word: "התלהבות", transliteration: "Hislahavus", meaning: "Enthusiasm, fervor", example: "He davens with such hislahavus!" },
+            { word: "דבֿקות", transliteration: "Dveykus", meaning: "Closeness to God", example: "Through prayer we achieve dveykus." },
+            { word: "השׁראה", transliteration: "Hashra'ah", meaning: "Inspiration", example: "The rabbi's words gave me hashra'ah." },
+            { word: "חידושׁ", transliteration: "Chiddush", meaning: "Novel insight", example: "He shared a beautiful chiddush." },
+            { word: "פּלפּול", transliteration: "Pilpul", meaning: "Sharp Talmudic analysis", example: "His pilpul was brilliant." },
+            { word: "סברא", transliteration: "Svara", meaning: "Reasoning, logical argument", example: "That's a good svara." },
+            { word: "קשׁיא", transliteration: "Kashya", meaning: "Question, difficulty", example: "I have a kashya on that." },
+            { word: "תּירוץ", transliteration: "Terutz", meaning: "Answer, resolution", example: "What's your terutz?" },
+            { word: "ראיה", transliteration: "Raya", meaning: "Proof", example: "He brought a raya from the Talmud." },
+            { word: "מקור", transliteration: "Makor", meaning: "Source", example: "What's the makor for that?" },
+            { word: "פּשׁט", transliteration: "Pshat", meaning: "Simple meaning", example: "The pshat of the verse is..." },
+            { word: "דרשׁ", transliteration: "Drash", meaning: "Homiletical interpretation", example: "The rabbi gave a beautiful drash." },
+            { word: "רמז", transliteration: "Remez", meaning: "Hint, allusion", example: "There's a remez in the text." },
+            { word: "סוד", transliteration: "Sod", meaning: "Secret, mystical meaning", example: "The sod reveals deep truths." },
+            { word: "גמטריא", transliteration: "Gematria", meaning: "Numerical value of letters", example: "The gematria of love equals life." },
+            { word: "נשׁמה", transliteration: "Neshama", meaning: "Soul", example: "She's a beautiful neshama." },
+            { word: "רוח", transliteration: "Ruach", meaning: "Spirit", example: "Feel the ruach of Shabbos." },
+            { word: "נפֿשׁ", transliteration: "Nefesh", meaning: "Life force, self", example: "With all my nefesh." },
+            { word: "גוף", transliteration: "Guf", meaning: "Body", example: "The guf needs rest too." },
+            { word: "עולם הבּא", transliteration: "Olam Haba", meaning: "The World to Come", example: "Earn your place in Olam Haba." },
+            { word: "עולם הזה", transliteration: "Olam Hazeh", meaning: "This world", example: "Olam hazeh is a corridor to Olam Haba." },
+            { word: "גן עדן", transliteration: "Gan Eden", meaning: "Garden of Eden, paradise", example: "May her soul rest in Gan Eden." },
+            { word: "גיהנום", transliteration: "Gehinnom", meaning: "Purgatory", example: "A place of spiritual cleansing." },
+            { word: "תּחיית המתים", transliteration: "Techias Hameisim", meaning: "Resurrection of the dead", example: "We believe in techias hameisim." },
+            { word: "משׁיח", transliteration: "Moshiach", meaning: "Messiah", example: "We await Moshiach every day." },
+            { word: "גאולה", transliteration: "Geulah", meaning: "Redemption", example: "May we see the geulah soon." },
+            { word: "חג שׂמח", transliteration: "Chag Sameach", meaning: "Happy holiday", example: "Chag sameach to you and yours!" },
+            { word: "גוט יום טוב", transliteration: "Gut Yom Tov", meaning: "Good holiday", example: "Gut Yom Tov, neighbor!" },
+            { word: "שׁנה טובֿה", transliteration: "Shana Tovah", meaning: "Good year", example: "Shana tovah u'metukah!" },
+            { word: "גמר חתימה טובֿה", transliteration: "Gmar Chasima Tovah", meaning: "May you be sealed for good", example: "Said between Rosh Hashanah and Yom Kippur." },
+            { word: "צום קל", transliteration: "Tzom Kal", meaning: "Easy fast", example: "Tzom kal on Yom Kippur!" },
+            { word: "חנוכּה שׂמח", transliteration: "Chanukah Sameach", meaning: "Happy Chanukah", example: "Chanukah sameach! Light the menorah!" },
+            { word: "פּורים שׂמח", transliteration: "Purim Sameach", meaning: "Happy Purim", example: "Purim sameach! Where's your costume?" },
+            { word: "פּסח כּשׁר ושׂמח", transliteration: "Pesach Kasher V'sameach", meaning: "Kosher and happy Passover", example: "Wishing you a Pesach kasher v'sameach!" },
+            { word: "חג המצות", transliteration: "Chag HaMatzos", meaning: "Festival of Unleavened Bread", example: "Passover is also called Chag HaMatzos." },
+            { word: "ספֿירת העומר", transliteration: "Sefirat HaOmer", meaning: "Counting of the Omer", example: "Tonight is day 33 of sefirat haomer." },
+            { word: "שׁבֿועות", transliteration: "Shavuos", meaning: "Festival of Weeks", example: "We received the Torah on Shavuos." },
+            { word: "סוכּות", transliteration: "Sukkos", meaning: "Festival of Booths", example: "Come eat in our sukkah for Sukkos!" },
+            { word: "שׂמחת תּורה", transliteration: "Simchas Torah", meaning: "Rejoicing with the Torah", example: "We dance with the Torah on Simchas Torah." },
+            { word: "ראשׁ השׁנה", transliteration: "Rosh Hashanah", meaning: "Jewish New Year", example: "Dip the apple in honey for Rosh Hashanah." },
+            { word: "יום כּיפּור", transliteration: "Yom Kippur", meaning: "Day of Atonement", example: "Yom Kippur is the holiest day." },
+            { word: "תּשׁרי", transliteration: "Tishrei", meaning: "First month of Jewish year", example: "Tishrei is full of holidays." },
+            { word: "ניסן", transliteration: "Nissan", meaning: "Month of Passover", example: "Spring arrives in Nissan." },
+            { word: "אדר", transliteration: "Adar", meaning: "Month of Purim", example: "When Adar comes, we increase joy!" },
+            { word: "אלול", transliteration: "Elul", meaning: "Month before High Holidays", example: "Elul is for reflection and teshuva." },
+            { word: "תּשׁובֿה", transliteration: "Teshuva", meaning: "Repentance, return", example: "Elul is the month of teshuva." },
+            { word: "סליחה", transliteration: "Selicha", meaning: "Forgiveness", example: "I ask for your selicha." },
+            { word: "מחילה", transliteration: "Mechila", meaning: "Pardon", example: "Please grant me mechila." },
+            { word: "כּפּרה", transliteration: "Kapparah", meaning: "Atonement", example: "Yom Kippur brings kapparah." },
+            { word: "ערב", transliteration: "Erev", meaning: "Eve of", example: "Erev Shabbos is Friday." },
+            { word: "מוצאי שׁבת", transliteration: "Motzaei Shabbos", meaning: "Saturday night", example: "We do havdalah motzaei Shabbos." },
+            { word: "הבֿדלה", transliteration: "Havdalah", meaning: "Separation ceremony", example: "The havdalah candle has multiple wicks." },
+            { word: "קידושׁ", transliteration: "Kiddush", meaning: "Sanctification over wine", example: "Who will make kiddush tonight?" },
+            { word: "המוציא", transliteration: "Hamotzi", meaning: "Blessing over bread", example: "After hamotzi, we can eat." },
+            { word: "בּרכת המזון", transliteration: "Birkat Hamazon", meaning: "Grace after meals", example: "Don't forget birkat hamazon!" },
+            { word: "זמירות", transliteration: "Zemiros", meaning: "Shabbos songs", example: "Sing the zemiros with feeling!" },
+            { word: "ניגון", transliteration: "Nigun", meaning: "Wordless melody", example: "The nigun lifted everyone's spirits." },
+            { word: "לײדיק", transliteration: "Leidik", meaning: "Empty, idle", example: "Don't sit around leidik!" },
+            { word: "פֿאַרנומען", transliteration: "Farnumen", meaning: "Busy, occupied", example: "I'm too farnumen to chat." },
+            { word: "מיד", transliteration: "Mied", meaning: "Tired", example: "I'm so mied after the holidays." },
+            { word: "הונגעריק", transliteration: "Hungerik", meaning: "Hungry", example: "The children are hungerik." },
+            { word: "שׁמעכּיק", transliteration: "Shmekdik", meaning: "Delicious, tasty", example: "The food is so shmekdik!" },
+            { word: "געשׁמאַק", transliteration: "Geshmak", meaning: "Delicious, enjoyable", example: "What a geshmak piece of cake!" },
+            { word: "זיס", transliteration: "Zis", meaning: "Sweet", example: "What a zis little baby!" },
+            { word: "זױער", transliteration: "Zoyer", meaning: "Sour", example: "The pickle is nice and zoyer." },
+            { word: "שׁאַרף", transliteration: "Sharf", meaning: "Sharp, spicy", example: "The horseradish is sharf!" },
+            { word: "קאַלט", transliteration: "Kalt", meaning: "Cold", example: "It's kalt outside, wear a coat!" },
+            { word: "װאַרעם", transliteration: "Varem", meaning: "Warm", example: "Come in where it's varem." },
+            { word: "שׁײן", transliteration: "Shayn", meaning: "Beautiful", example: "What a shayne kinde!" },
+            { word: "פֿײַן", transliteration: "Fayn", meaning: "Fine, nice", example: "Everything is fayn." },
+            { word: "שׁלעכט", transliteration: "Shlekht", meaning: "Bad", example: "I feel shlekht about what happened." },
+            { word: "גוט", transliteration: "Gut", meaning: "Good", example: "That's gut news!" },
+            { word: "בּעסער", transliteration: "Beser", meaning: "Better", example: "Today I feel beser." },
+            { word: "בּעסט", transliteration: "Best", meaning: "Best", example: "You're the best!" },
+            { word: "גרױס", transliteration: "Groys", meaning: "Big, great", example: "A groyse yasher koach!" },
+            { word: "קלײן", transliteration: "Kleyn", meaning: "Small", example: "Such a kleyn portion?" },
+            { word: "אַלט", transliteration: "Alt", meaning: "Old", example: "The alte bubbe remembers everything." },
+            { word: "יונג", transliteration: "Yung", meaning: "Young", example: "He's still a yunger man." },
+            { word: "נײַ", transliteration: "Nay", meaning: "New", example: "Mazel tov on your naye house!" },
+            { word: "פֿרישׁ", transliteration: "Frish", meaning: "Fresh", example: "The challah is frish from the oven." },
+            { word: "שׁטאַרק", transliteration: "Shtark", meaning: "Strong", example: "Be shtark, you can do it!" },
+            { word: "שׁװאַך", transliteration: "Shvakh", meaning: "Weak", example: "After being sick, I feel shvakh." },
+            { word: "שׁװער", transliteration: "Shver", meaning: "Difficult", example: "It's shver to learn a new language." },
+            { word: "גרינג", transliteration: "Gring", meaning: "Easy", example: "The test was gring." },
+            { word: "ישׁר כּח", transliteration: "Yasher Koach", meaning: "Well done, congratulations", example: "Yasher koach on your speech!" },
+            { word: "גײ מיט גאָט", transliteration: "Gay Mit Got", meaning: "Go with God", example: "Gay mit Got, safe travels!" }
+        ];
+        
+        window.currentYiddishIndex = 0;
+        
+        // Open course
+        window.openCourse = function(course) {
+            if (course === 'yiddish') {
+                document.getElementById('yiddishPanel').classList.add('open');
+                window.displayYiddishWord(0);
+            } else if (course === 'parsha') {
+                window.loadTorahPortion();
+            } else if (course === 'talmud') {
+                window.askRabbi('Please teach me a profound story or insight from the Talmud, with the original source, its meaning, and how I can apply it in my life.');
+            }
+        };
+        
+        window.closeYiddishPanel = function() {
+            document.getElementById('yiddishPanel').classList.remove('open');
+        };
+        
+        window.displayYiddishWord = function(index) {
+            var words = window.yiddishWords;
+            if (index < 0) index = 0;
+            if (index >= words.length) index = words.length - 1;
+            window.currentYiddishIndex = index;
+            
+            var word = words[index];
+            var content = document.getElementById('yiddishContent');
+            
+            content.innerHTML = '<div class="yiddish-word-card">' +
+                '<div class="yiddish-word">' + word.word + '</div>' +
+                '<div class="yiddish-transliteration">' + word.transliteration + '</div>' +
+                '<div class="yiddish-meaning">' + word.meaning + '</div>' +
+                '<div class="yiddish-example">"' + word.example + '"</div>' +
+                '<button class="yiddish-speak-btn" onclick="window.speakYiddishWord()">🔊 Hear Rabbi Pronounce It</button>' +
+            '</div>';
+            
+            document.getElementById('yiddishWordNum').textContent = 'Word ' + (index + 1) + ' of ' + words.length;
+            document.getElementById('yiddishProgressFill').style.width = ((index + 1) / words.length * 100) + '%';
+            
+            document.getElementById('yiddishPrevBtn').disabled = index === 0;
+            document.getElementById('yiddishNextBtn').disabled = index === words.length - 1;
+        };
+        
+        window.nextYiddishWord = function() {
+            window.displayYiddishWord(window.currentYiddishIndex + 1);
+        };
+        
+        window.prevYiddishWord = function() {
+            window.displayYiddishWord(window.currentYiddishIndex - 1);
+        };
+        
+        window.randomYiddishWord = function() {
+            var randomIndex = Math.floor(Math.random() * window.yiddishWords.length);
+            window.displayYiddishWord(randomIndex);
+        };
+        
+        window.speakYiddishWord = async function() {
+            var word = window.yiddishWords[window.currentYiddishIndex];
+            var text = word.transliteration + '. ' + word.meaning + '. For example: ' + word.example;
+            
+            // Create a temporary element to speak
+            var tempEl = document.createElement('div');
+            tempEl.innerHTML = '<p>' + text + '</p>';
+            document.body.appendChild(tempEl);
+            
+            await window.speakMessage(tempEl);
+            
+            // Remove after starting speech
+            setTimeout(function() {
+                document.body.removeChild(tempEl);
+            }, 1000);
         };
         
         // Stop generation
@@ -4458,7 +4974,7 @@
         // 🔊 TEXT-TO-SPEECH (Rabbi Voice)
         // ═══════════════════════════════════════════════════════════════
         // ═══════════════════════════════════════════════════════════════
-        // 🔊 ADVANCED SPEECH SYSTEM WITH FULL CONTROLS
+        // 🔊 GEMINI 2.5 FLASH TTS - AMAZING HUMAN VOICE
         // ═══════════════════════════════════════════════════════════════
         
         // Speech state
@@ -4467,13 +4983,15 @@
             isPaused: false,
             chunks: [],
             currentChunkIndex: 0,
-            utterance: null,
+            audioContext: null,
+            audioQueue: [],
+            currentSource: null,
             rate: 1.0
         };
         
-        // Split text into chunks to prevent cutoff (browser TTS has ~60 second limit)
+        // Split text into chunks for TTS
         function splitTextIntoChunks(text, maxLength) {
-            maxLength = maxLength || 150; // shorter chunks for reliability
+            maxLength = maxLength || 300;
             var chunks = [];
             var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
             var currentChunk = '';
@@ -4495,7 +5013,6 @@
         
         // Show audio player UI
         function showAudioPlayer(messageElement) {
-            // Remove any existing player
             hideAudioPlayer();
             
             var state = window.rabbiSpeechState;
@@ -4538,59 +5055,161 @@
             }
         }
         
-        // Speak current chunk
-        function speakCurrentChunk() {
+        // Convert PCM16 to playable audio
+        function pcm16ToAudioBuffer(base64Data, sampleRate) {
+            var state = window.rabbiSpeechState;
+            if (!state.audioContext) {
+                state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            var binaryString = atob(base64Data);
+            var bytes = new Uint8Array(binaryString.length);
+            for (var i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            
+            // Convert to Int16Array
+            var int16Array = new Int16Array(bytes.buffer);
+            
+            // Convert to Float32 for Web Audio API
+            var float32Array = new Float32Array(int16Array.length);
+            for (var i = 0; i < int16Array.length; i++) {
+                float32Array[i] = int16Array[i] / 32768.0;
+            }
+            
+            // Create audio buffer
+            var audioBuffer = state.audioContext.createBuffer(1, float32Array.length, sampleRate || 24000);
+            audioBuffer.getChannelData(0).set(float32Array);
+            
+            return audioBuffer;
+        }
+        
+        // Play audio buffer with speed control
+        function playAudioBuffer(audioBuffer, onEnded) {
             var state = window.rabbiSpeechState;
             
-            if (state.currentChunkIndex >= state.chunks.length) {
-                // Finished all chunks
-                window.stopSpeech();
+            if (state.currentSource) {
+                state.currentSource.stop();
+            }
+            
+            var source = state.audioContext.createBufferSource();
+            source.buffer = audioBuffer;
+            source.playbackRate.value = state.rate;
+            source.connect(state.audioContext.destination);
+            
+            source.onended = function() {
+                state.currentSource = null;
+                if (onEnded) onEnded();
+            };
+            
+            state.currentSource = source;
+            source.start(0);
+        }
+        
+        // Fetch TTS audio from Gemini 2.5 Flash
+        async function fetchGeminiTTS(text) {
+            try {
+                var response = await fetch('/.netlify/functions/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        text: text,
+                        voice: 'Charon', // Deep male voice for Rabbi
+                        style: 'Speak warmly and wisely like a kind elderly rabbi with a slight Eastern European accent, with gentle pacing and occasional thoughtful pauses'
+                    })
+                });
+                
+                var data = await response.json();
+                
+                if (data.fallback || data.error || !data.audio) {
+                    console.log('Gemini TTS unavailable, using browser fallback');
+                    return null;
+                }
+                
+                return {
+                    audio: data.audio,
+                    sampleRate: data.sampleRate || 24000
+                };
+            } catch (error) {
+                console.log('TTS fetch error:', error);
+                return null;
+            }
+        }
+        
+        // Speak current chunk using Gemini TTS or browser fallback
+        async function speakCurrentChunk() {
+            var state = window.rabbiSpeechState;
+            
+            if (!state.isPlaying || state.currentChunkIndex >= state.chunks.length) {
+                if (state.currentChunkIndex >= state.chunks.length) {
+                    window.stopSpeech();
+                }
                 return;
             }
             
+            var chunk = state.chunks[state.currentChunkIndex];
+            updateProgress();
+            
+            // Try Gemini TTS first
+            var ttsResult = await fetchGeminiTTS(chunk);
+            
+            if (ttsResult && ttsResult.audio) {
+                // Use Gemini TTS (amazing human voice)
+                try {
+                    var audioBuffer = pcm16ToAudioBuffer(ttsResult.audio, ttsResult.sampleRate);
+                    playAudioBuffer(audioBuffer, function() {
+                        if (state.isPlaying && !state.isPaused) {
+                            state.currentChunkIndex++;
+                            speakCurrentChunk();
+                        }
+                    });
+                } catch (error) {
+                    console.log('Audio playback error, using browser TTS:', error);
+                    useBrowserTTSForChunk(chunk);
+                }
+            } else {
+                // Fallback to browser TTS
+                useBrowserTTSForChunk(chunk);
+            }
+        }
+        
+        // Browser TTS fallback for a single chunk
+        function useBrowserTTSForChunk(chunk) {
+            var state = window.rabbiSpeechState;
+            
             if (!('speechSynthesis' in window)) {
-                alert('Text-to-speech not supported in your browser');
+                console.log('No speech synthesis available');
+                state.currentChunkIndex++;
+                if (state.isPlaying) speakCurrentChunk();
                 return;
             }
             
             speechSynthesis.cancel();
             
-            var chunk = state.chunks[state.currentChunkIndex];
             var utterance = new SpeechSynthesisUtterance(chunk);
             utterance.lang = window.currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
             utterance.rate = state.rate;
-            utterance.pitch = 0.95;
+            utterance.pitch = 0.9;
             
-            // Find a good voice
             var voices = speechSynthesis.getVoices();
             var preferredVoice = voices.find(function(v) {
-                return v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'));
+                return v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David'));
             }) || voices.find(function(v) { return v.lang.startsWith('en'); });
             if (preferredVoice) utterance.voice = preferredVoice;
             
             utterance.onend = function() {
                 if (state.isPlaying && !state.isPaused) {
                     state.currentChunkIndex++;
-                    updateProgress();
-                    speakCurrentChunk(); // Speak next chunk
-                }
-            };
-            
-            utterance.onerror = function(e) {
-                console.log('Speech error:', e);
-                if (state.isPlaying) {
-                    state.currentChunkIndex++;
-                    updateProgress();
                     speakCurrentChunk();
                 }
             };
             
-            state.utterance = utterance;
-            speechSynthesis.speak(utterance);
-            updateProgress();
+            utterance.onerror = function() {
+                state.currentChunkIndex++;
+                if (state.isPlaying) speakCurrentChunk();
+            };
             
-            var playBtn = document.getElementById('playPauseBtn');
-            if (playBtn) playBtn.textContent = '⏸️';
+            speechSynthesis.speak(utterance);
         }
         
         // Main speak function
@@ -4619,14 +5238,19 @@
                 return;
             }
             
+            // Initialize audio context
+            if (!state.audioContext) {
+                state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
             // Initialize state
-            state.chunks = splitTextIntoChunks(text, 150);
+            state.chunks = splitTextIntoChunks(text, 300);
             state.currentChunkIndex = 0;
             state.isPlaying = true;
             state.isPaused = false;
             state.messageElement = messageElement;
             
-            console.log('Speaking ' + state.chunks.length + ' chunks');
+            console.log('Speaking ' + state.chunks.length + ' chunks with Gemini TTS');
             
             // Show player UI
             showAudioPlayer(messageElement);
@@ -4645,27 +5269,33 @@
             var playBtn = document.getElementById('playPauseBtn');
             
             if (state.isPaused) {
-                // Resume
                 state.isPaused = false;
-                speechSynthesis.resume();
                 if (playBtn) playBtn.textContent = '⏸️';
+                speakCurrentChunk();
             } else {
-                // Pause
                 state.isPaused = true;
-                speechSynthesis.pause();
+                if (state.currentSource) {
+                    state.currentSource.stop();
+                }
+                speechSynthesis.cancel();
                 if (playBtn) playBtn.textContent = '▶️';
             }
         };
         
         window.stopSpeech = function() {
             var state = window.rabbiSpeechState;
+            
+            if (state.currentSource) {
+                state.currentSource.stop();
+                state.currentSource = null;
+            }
             speechSynthesis.cancel();
+            
             state.isPlaying = false;
             state.isPaused = false;
             state.chunks = [];
             state.currentChunkIndex = 0;
             
-            // Reset button
             if (state.messageElement) {
                 var speakerBtn = state.messageElement.querySelector('.speaker-btn');
                 if (speakerBtn) speakerBtn.textContent = '🔊 Listen';
@@ -4677,6 +5307,7 @@
         window.skipForward = function() {
             var state = window.rabbiSpeechState;
             if (state.currentChunkIndex < state.chunks.length - 1) {
+                if (state.currentSource) state.currentSource.stop();
                 speechSynthesis.cancel();
                 state.currentChunkIndex++;
                 speakCurrentChunk();
@@ -4686,6 +5317,7 @@
         window.skipBackward = function() {
             var state = window.rabbiSpeechState;
             if (state.currentChunkIndex > 0) {
+                if (state.currentSource) state.currentSource.stop();
                 speechSynthesis.cancel();
                 state.currentChunkIndex--;
                 speakCurrentChunk();
@@ -4698,15 +5330,14 @@
             var speedEl = document.getElementById('speedValue');
             if (speedEl) speedEl.textContent = state.rate.toFixed(1) + 'x';
             
-            // If currently playing, restart current chunk with new speed
-            if (state.isPlaying && !state.isPaused) {
-                speechSynthesis.cancel();
-                speakCurrentChunk();
+            // Update playback rate if playing with Web Audio
+            if (state.currentSource) {
+                state.currentSource.playbackRate.value = state.rate;
             }
         };
         
         window.speakMessage = speakMessage;
-        console.log('✅ Advanced speech system initialized');
+        console.log('✅ Gemini 2.5 Flash TTS system initialized');
 
         // ═══════════════════════════════════════════════════════════════
         // 🔲 FULLSCREEN TOGGLE
