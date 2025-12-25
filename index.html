@@ -3602,7 +3602,11 @@
 
     <!-- Define toggleRabbiChat EARLY so onclick works -->
     <script>
-        console.log('📍 Early script: Defining toggleRabbiChat');
+        console.log('📍 Early script: Defining toggleRabbiChat and sendRabbiMessage');
+        
+        // Track conversation history
+        window.rabbiConversationHistory = [];
+        
         window.toggleRabbiChat = function() {
             console.log('🕎 toggleRabbiChat CALLED!');
             var chatWindow = document.getElementById('rabbiChatWindow');
@@ -3618,7 +3622,92 @@
                 if (input) input.focus();
             }
         };
+        
+        window.sendRabbiMessage = async function() {
+            console.log('📤 sendRabbiMessage CALLED!');
+            var input = document.getElementById('rabbiInput');
+            var message = input ? input.value.trim() : '';
+            console.log('💬 Message:', message);
+            
+            if (!message) {
+                console.log('⚠️ Empty message, returning');
+                return;
+            }
+            
+            var messagesDiv = document.getElementById('rabbiMessages');
+            
+            // Add user message to chat
+            var userDiv = document.createElement('div');
+            userDiv.className = 'rabbi-message user';
+            userDiv.innerHTML = '<p>' + message + '</p>';
+            messagesDiv.appendChild(userDiv);
+            
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            // Show typing indicator
+            var typingDiv = document.createElement('div');
+            typingDiv.className = 'rabbi-typing';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = '<span></span><span></span><span></span>';
+            messagesDiv.appendChild(typingDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            
+            try {
+                console.log('🌐 Calling rabbi API...');
+                var response = await fetch('/.netlify/functions/rabbi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        conversationHistory: window.rabbiConversationHistory
+                    })
+                });
+                
+                console.log('📡 API response status:', response.status);
+                var data = await response.json();
+                console.log('📦 API data:', data);
+                
+                // Remove typing indicator
+                var typing = document.getElementById('typingIndicator');
+                if (typing) typing.remove();
+                
+                // Add rabbi response
+                var rabbiDiv = document.createElement('div');
+                rabbiDiv.className = 'rabbi-message rabbi';
+                var responseText = data.response || data.error || 'I apologize, something went wrong.';
+                rabbiDiv.innerHTML = '<p>' + responseText.replace(/\n/g, '<br>') + '</p>';
+                
+                // Add speaker button
+                var speakerBtn = document.createElement('button');
+                speakerBtn.className = 'speaker-btn';
+                speakerBtn.innerHTML = '🔊';
+                speakerBtn.onclick = function() {
+                    if (window.speakMessage) window.speakMessage(rabbiDiv);
+                };
+                rabbiDiv.appendChild(speakerBtn);
+                
+                messagesDiv.appendChild(rabbiDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                
+                // Update conversation history
+                window.rabbiConversationHistory.push({ role: 'user', content: message });
+                window.rabbiConversationHistory.push({ role: 'assistant', content: responseText });
+                
+            } catch (error) {
+                console.error('❌ Rabbi API error:', error);
+                var typing = document.getElementById('typingIndicator');
+                if (typing) typing.remove();
+                
+                var errorDiv = document.createElement('div');
+                errorDiv.className = 'rabbi-message rabbi';
+                errorDiv.innerHTML = '<p>I apologize, but I am having trouble connecting. Please try again.</p>';
+                messagesDiv.appendChild(errorDiv);
+            }
+        };
+        
         console.log('✅ toggleRabbiChat is now:', typeof window.toggleRabbiChat);
+        console.log('✅ sendRabbiMessage is now:', typeof window.sendRabbiMessage);
     </script>
 
     <!-- Daily widgets removed - Rabbi chat with Torah Portion is the main AI feature -->
@@ -4229,83 +4318,4 @@
             container.innerHTML = `
                 <div class="quiz-results">
                     <h2>🕎 Your Sacred Pathways</h2>
-                    <p class="subtitle">Based on your answers, here are the pathways that resonate most with your soul...</p>
-                    
-                    ${data.rabbiMessage ? `
-                        <div style="background: var(--gradient-torah); color: white; padding: 1.5rem; border-radius: 15px; margin: 1.5rem 0; text-align: left;">
-                            <p style="margin: 0;"><strong>Rabbi Moshe says:</strong></p>
-                            <p style="margin: 0.5rem 0 0 0; font-style: italic;">"${data.rabbiMessage}"</p>
-                        </div>
-                    ` : ''}
-                    
-                    ${recommendationsHTML}
-                    
-                    <div style="margin-top: 2rem;">
-                        <button class="quiz-btn secondary" onclick="openPathwayQuiz()">Retake Quiz</button>
-                        <button class="quiz-btn primary" onclick="closeQuiz()">Explore Pathways</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        // ═══════════════════════════════════════════════════════════════
-        // 🚀 INITIALIZATION
-        // ═══════════════════════════════════════════════════════════════
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🕎 Jewish Renaissance AI Features Loaded');
-            
-            // Add quiz button to sidebar or welcome section
-            addQuizButton();
-        });
-
-        function addQuizButton() {
-            // Add a "Find My Path" button to the welcome section
-            const welcomeSection = document.getElementById('welcome');
-            if (welcomeSection) {
-                const valuesGrid = welcomeSection.querySelector('.values-grid');
-                if (valuesGrid) {
-                    const quizCard = document.createElement('div');
-                    quizCard.className = 'value-card';
-                    quizCard.style.cursor = 'pointer';
-                    quizCard.onclick = openPathwayQuiz;
-                    quizCard.innerHTML = `
-                        <h3 class="value-title">🎯 Find Your Sacred Pathways</h3>
-                        <p class="value-hebrew">גלה את דרכך</p>
-                        <p class="value-description">
-                            Take a short quiz to discover which of the 60 sacred pathways are the perfect match for your skills, interests, and soul. Rabbi Moshe will personally analyze your answers.
-                        </p>
-                        <div class="value-quote" style="background: var(--gradient-torah); color: white;">
-                            Click Here to Start Your Journey →
-                        </div>
-                    `;
-                    valuesGrid.appendChild(quizCard);
-                }
-            }
-        }
-
-        // Auto-resize textarea
-        document.addEventListener('input', function(e) {
-            if (e.target.id === 'rabbiInput') {
-                e.target.style.height = 'auto';
-                e.target.style.height = Math.min(e.target.scrollHeight, 100) + 'px';
-            }
-        });
-
-        // ═══════════════════════════════════════════════════════════════
-        // 📜 TORAH PORTION - Weekly Parasha with Deep Teaching
-        // ═══════════════════════════════════════════════════════════════
-        async function loadTorahPortion() {
-            addMessageToChat('rabbi', '📜 Let me share this week\'s Torah portion and prepare a teaching for you, Dr. Goldstein...');
-            showTypingIndicator();
-            
-            try {
-                // Get today's date for context
-                const today = new Date();
-                const dateStr = today.toLocaleDateString('en-US', { 
-                    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
-                });
-                
-                // Ask Rabbi directly for the Torah portion (he knows the calendar!)
-                const torahPrompt = `Today is ${dateStr}. Please provide a comprehensive teaching on this week's Torah portion (Parashat HaShavua).
-
-As R
+                    <p c
