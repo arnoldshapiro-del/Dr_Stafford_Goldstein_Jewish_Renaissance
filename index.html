@@ -4898,12 +4898,17 @@
         ];
         
         window.currentYiddishIndex = 0;
+        window.yiddishLearned = JSON.parse(localStorage.getItem('yiddishLearned') || '[]');
+        window.currentYiddishWord = null;
+        window.yiddishSpeechRate = 0.9;
+        window.currentYiddishCategory = 'all';
         
         // Open course
         window.openCourse = function(course) {
             if (course === 'yiddish') {
                 document.getElementById('yiddishPanel').classList.add('open');
-                window.displayYiddishWord(0);
+                window.renderYiddishGrid();
+                window.updateLearnedCount();
             } else if (course === 'parsha') {
                 window.loadTorahPortion();
             } else if (course === 'talmud') {
@@ -4913,123 +4918,199 @@
         
         window.closeYiddishPanel = function() {
             document.getElementById('yiddishPanel').classList.remove('open');
+            window.stopAllYiddishSpeech();
         };
         
-        window.displayYiddishWord = function(index) {
-            var words = window.yiddishWords;
-            if (index < 0) index = 0;
-            if (index >= words.length) index = words.length - 1;
-            window.currentYiddishIndex = index;
+        window.updateLearnedCount = function() {
+            var el = document.getElementById('yiddishLearnedCount');
+            if (el) el.textContent = window.yiddishLearned.length + '/200 learned';
+        };
+        
+        window.renderYiddishGrid = function() {
+            var grid = document.getElementById('yiddishWordGrid');
+            if (!grid) { console.error('yiddishWordGrid not found'); return; }
             
-            var word = words[index];
-            var content = document.getElementById('yiddishContent');
+            var words = window.getFilteredWords();
+            var html = '';
             
-            content.innerHTML = '<div class="yiddish-word-card">' +
-                '<div class="yiddish-word">' + word.word + '</div>' +
-                '<div class="yiddish-transliteration">' + word.transliteration + '</div>' +
-                '<div class="yiddish-meaning">' + word.meaning + '</div>' +
-                '<div class="yiddish-example">"' + word.example + '"</div>' +
-                '<button class="yiddish-speak-btn" onclick="window.speakYiddishWord()">🔊 Hear Rabbi Pronounce It</button>' +
-            '</div>';
+            words.forEach(function(word, index) {
+                var isLearned = window.yiddishLearned.includes(word.transliteration);
+                html += '<div class="yiddish-word-tile' + (isLearned ? ' learned' : '') + '" ' +
+                    'onclick="window.handleTileClick(\'' + word.transliteration.replace(/'/g, "\\'") + '\')">' +
+                    '<span class="yiddish-tile-speaker">🔊</span>' +
+                    (isLearned ? '<span class="yiddish-tile-check">✓</span>' : '') +
+                    '<div class="yiddish-tile-word">' + word.word + '</div>' +
+                    '<div class="yiddish-tile-translit">' + word.transliteration + '</div>' +
+                '</div>';
+            });
             
-            document.getElementById('yiddishWordNum').textContent = 'Word ' + (index + 1) + ' of ' + words.length;
-            document.getElementById('yiddishProgressFill').style.width = ((index + 1) / words.length * 100) + '%';
+            grid.innerHTML = html;
+        };
+        
+        window.getFilteredWords = function() {
+            // Since words don't have categories yet, return all for any filter
+            // This will show all 200 words regardless of tab selected
+            return window.yiddishWords;
+        };
+        
+        window.filterByCategory = function(category) {
+            window.currentYiddishCategory = category;
             
-            document.getElementById('yiddishPrevBtn').disabled = index === 0;
-            document.getElementById('yiddishNextBtn').disabled = index === words.length - 1;
+            document.querySelectorAll('.yiddish-tab').forEach(function(tab) {
+                tab.classList.remove('active');
+                if (tab.dataset.category === category) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            window.renderYiddishGrid();
         };
         
-        window.nextYiddishWord = function() {
-            window.displayYiddishWord(window.currentYiddishIndex + 1);
+        window.filterYiddishWords = function(searchTerm) {
+            var grid = document.getElementById('yiddishWordGrid');
+            if (!grid) return;
+            
+            var words = window.getFilteredWords();
+            searchTerm = (searchTerm || '').toLowerCase();
+            
+            var filtered = searchTerm ? words.filter(function(w) {
+                return w.transliteration.toLowerCase().includes(searchTerm) ||
+                       w.meaning.toLowerCase().includes(searchTerm) ||
+                       w.word.includes(searchTerm);
+            }) : words;
+            
+            var html = '';
+            filtered.forEach(function(word) {
+                var isLearned = window.yiddishLearned.includes(word.transliteration);
+                html += '<div class="yiddish-word-tile' + (isLearned ? ' learned' : '') + '" ' +
+                    'onclick="window.handleTileClick(\'' + word.transliteration.replace(/'/g, "\\'") + '\')">' +
+                    '<span class="yiddish-tile-speaker">🔊</span>' +
+                    (isLearned ? '<span class="yiddish-tile-check">✓</span>' : '') +
+                    '<div class="yiddish-tile-word">' + word.word + '</div>' +
+                    '<div class="yiddish-tile-translit">' + word.transliteration + '</div>' +
+                '</div>';
+            });
+            
+            grid.innerHTML = html || '<p style="text-align:center;color:#666;padding:20px;">No words found</p>';
         };
         
-        window.prevYiddishWord = function() {
-            window.displayYiddishWord(window.currentYiddishIndex - 1);
+        window.handleTileClick = function(transliteration) {
+            var word = window.yiddishWords.find(function(w) { return w.transliteration === transliteration; });
+            if (!word) return;
+            
+            window.currentYiddishWord = word;
+            window.speakYiddishWordQuick(word);
+            window.showYiddishDetail(word);
         };
         
-        window.randomYiddishWord = function() {
-            var randomIndex = Math.floor(Math.random() * window.yiddishWords.length);
-            window.displayYiddishWord(randomIndex);
+        window.speakYiddishWordQuick = function(word) {
+            window.stopAllYiddishSpeech();
+            
+            var text = word.transliteration + '. ' + word.meaning;
+            
+            if ('speechSynthesis' in window) {
+                var utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = window.yiddishSpeechRate;
+                utterance.pitch = 0.9;
+                utterance.lang = 'en-US';
+                window.currentYiddishUtterance = utterance;
+                speechSynthesis.speak(utterance);
+            }
         };
         
-        window.speakYiddishWord = async function() {
-            var word = window.yiddishWords[window.currentYiddishIndex];
+        window.showYiddishDetail = function(word) {
+            document.getElementById('detailWord').textContent = word.word;
+            document.getElementById('detailTranslit').textContent = word.transliteration;
+            document.getElementById('detailMeaning').textContent = word.meaning;
+            document.getElementById('detailExample').textContent = '"' + word.example + '"';
+            
+            var learnedBtn = document.getElementById('detailLearnedBtn');
+            if (window.yiddishLearned.includes(word.transliteration)) {
+                learnedBtn.classList.add('learned');
+                learnedBtn.textContent = '✓ Learned!';
+            } else {
+                learnedBtn.classList.remove('learned');
+                learnedBtn.textContent = '✓ Mark as Learned';
+            }
+            
+            document.getElementById('yiddishDetailOverlay').classList.add('open');
+        };
+        
+        window.closeYiddishDetail = function(event) {
+            if (event && event.target !== event.currentTarget) return;
+            document.getElementById('yiddishDetailOverlay').classList.remove('open');
+        };
+        
+        window.speakCurrentDetail = function() {
+            if (!window.currentYiddishWord) return;
+            
+            var word = window.currentYiddishWord;
+            var btn = document.querySelector('.yiddish-hear-btn');
+            if (btn) {
+                btn.classList.add('speaking');
+                btn.textContent = '🔊 Speaking...';
+            }
+            
             var text = word.transliteration + '. ' + word.meaning + '. For example: ' + word.example;
             
-            // Show spinner and controls
-            var btn = document.querySelector('.yiddish-speak-btn');
+            if ('speechSynthesis' in window) {
+                speechSynthesis.cancel();
+                var utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = window.yiddishSpeechRate;
+                utterance.pitch = 0.9;
+                
+                utterance.onend = function() {
+                    if (btn) {
+                        btn.classList.remove('speaking');
+                        btn.textContent = '🔊 Hear Rabbi Pronounce';
+                    }
+                };
+                
+                window.currentYiddishUtterance = utterance;
+                speechSynthesis.speak(utterance);
+            }
+        };
+        
+        window.toggleLearned = function() {
+            if (!window.currentYiddishWord) return;
+            
+            var translit = window.currentYiddishWord.transliteration;
+            var index = window.yiddishLearned.indexOf(translit);
+            
+            if (index > -1) {
+                window.yiddishLearned.splice(index, 1);
+            } else {
+                window.yiddishLearned.push(translit);
+            }
+            
+            localStorage.setItem('yiddishLearned', JSON.stringify(window.yiddishLearned));
+            
+            var learnedBtn = document.getElementById('detailLearnedBtn');
+            if (window.yiddishLearned.includes(translit)) {
+                learnedBtn.classList.add('learned');
+                learnedBtn.textContent = '✓ Learned!';
+            } else {
+                learnedBtn.classList.remove('learned');
+                learnedBtn.textContent = '✓ Mark as Learned';
+            }
+            
+            window.updateLearnedCount();
+            window.renderYiddishGrid();
+        };
+        
+        window.setYiddishSpeed = function(value) {
+            window.yiddishSpeechRate = parseFloat(value);
+            var el = document.getElementById('yiddishGlobalSpeedVal');
+            if (el) el.textContent = parseFloat(value).toFixed(1) + 'x';
+        };
+        
+        window.stopAllYiddishSpeech = function() {
+            speechSynthesis.cancel();
+            var btn = document.querySelector('.yiddish-hear-btn');
             if (btn) {
-                btn.outerHTML = '<div class="yiddish-audio-controls" id="yiddishAudioControls">' +
-                    '<div class="yiddish-spinner-row">' +
-                        '<div class="rabbi-spinner"></div>' +
-                        '<span>Rabbi is speaking...</span>' +
-                    '</div>' +
-                    '<div class="yiddish-control-row">' +
-                        '<button class="yiddish-stop-btn" onclick="window.stopYiddishSpeech()">⏹️ Stop</button>' +
-                        '<div class="yiddish-speed-control">' +
-                            '<span>Speed:</span>' +
-                            '<input type="range" id="yiddishSpeedSlider" min="0.5" max="2" step="0.1" value="1" oninput="window.changeYiddishSpeed(this.value)">' +
-                            '<span id="yiddishSpeedValue">1.0x</span>' +
-                        '</div>' +
-                    '</div>' +
-                '</div>';
+                btn.classList.remove('speaking');
+                btn.textContent = '🔊 Hear Rabbi Pronounce';
             }
-            
-            // Create a temporary element to speak
-            var tempEl = document.createElement('div');
-            tempEl.id = 'yiddishTempSpeech';
-            tempEl.innerHTML = '<p>' + text + '</p>';
-            tempEl.style.display = 'none';
-            document.body.appendChild(tempEl);
-            
-            // Store reference for stopping
-            window.yiddishSpeechElement = tempEl;
-            
-            await window.speakMessage(tempEl);
-        };
-        
-        window.stopYiddishSpeech = function() {
-            window.stopSpeech();
-            window.resetYiddishSpeakButton();
-            
-            // Remove temp element
-            var tempEl = document.getElementById('yiddishTempSpeech');
-            if (tempEl) tempEl.remove();
-        };
-        
-        window.changeYiddishSpeed = function(value) {
-            var state = window.rabbiSpeechState;
-            state.rate = parseFloat(value);
-            var speedEl = document.getElementById('yiddishSpeedValue');
-            if (speedEl) speedEl.textContent = parseFloat(value).toFixed(1) + 'x';
-            
-            // Also update the main speed slider if it exists
-            var mainSlider = document.getElementById('speedSlider');
-            if (mainSlider) mainSlider.value = value;
-            var mainSpeedEl = document.getElementById('speedValue');
-            if (mainSpeedEl) mainSpeedEl.textContent = parseFloat(value).toFixed(1) + 'x';
-            
-            // Update playback rate if playing
-            if (state.currentSource) {
-                state.currentSource.playbackRate.value = state.rate;
-            }
-        };
-        
-        window.resetYiddishSpeakButton = function() {
-            var controls = document.getElementById('yiddishAudioControls');
-            if (controls) {
-                controls.outerHTML = '<button class="yiddish-speak-btn" onclick="window.speakYiddishWord()">🔊 Hear Rabbi Pronounce It</button>';
-            }
-        };
-        
-        // Override the original stopSpeech to also reset Yiddish button
-        var originalStopSpeech = window.stopSpeech;
-        window.stopSpeech = function() {
-            originalStopSpeech();
-            window.resetYiddishSpeakButton();
-            
-            var tempEl = document.getElementById('yiddishTempSpeech');
-            if (tempEl) tempEl.remove();
         };
         
         // Stop generation
@@ -6324,4 +6405,3 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
 
 </body>
 </html>
-
