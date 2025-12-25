@@ -798,277 +798,6 @@
         }
 
         /* ═══════════════════════════════════════════════════════════════
-           🔄 ENHANCED LOADING & CONTROLS
-           ═══════════════════════════════════════════════════════════════ */
-        
-        /* Enhanced typing indicator with spinner and message */
-        .rabbi-loading-container {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-            padding: 1rem;
-            background: linear-gradient(135deg, #fff 0%, #f8f4e8 100%);
-            border-radius: 18px;
-            border: 2px solid var(--synagogue-gold);
-            align-self: flex-start;
-            max-width: 85%;
-            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.2);
-        }
-        
-        .rabbi-loading-spinner {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .rabbi-spinner {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(184, 134, 11, 0.3);
-            border-top-color: var(--synagogue-gold);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .rabbi-loading-text {
-            color: var(--torah-blue);
-            font-style: italic;
-            font-size: 0.95rem;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
-        }
-        
-        .rabbi-stop-btn {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            color: white;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 15px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            transition: all 0.2s;
-            margin-top: 0.5rem;
-        }
-        
-        .rabbi-stop-btn:hover {
-            background: linear-gradient(135deg, #c82333 0%, #a71d2a 100%);
-            transform: scale(1.05);
-        }
-        
-        /* Response Mode Toggle */
-        .rabbi-mode-toggle {
-            display: flex;
-            gap: 0.25rem;
-            padding: 0.5rem 0.75rem;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 20px;
-            border: 1px solid rgba(184, 134, 11, 0.3);
-        }
-        
-        .rabbi-mode-btn {
-            padding: 0.35rem 0.6rem;
-            border: 1px solid transparent;
-            background: transparent;
-            border-radius: 15px;
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #666;
-            white-space: nowrap;
-        }
-        
-        .rabbi-mode-btn:hover {
-            background: rgba(184, 134, 11, 0.1);
-            color: var(--torah-blue);
-        }
-        
-        .rabbi-mode-btn.active {
-            background: var(--torah-blue);
-            color: white;
-            border-color: var(--torah-blue);
-        }
-        
-        /* Message Action Buttons */
-        .rabbi-message-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid rgba(184, 134, 11, 0.2);
-            flex-wrap: wrap;
-        }
-        
-        .rabbi-action-btn {
-            padding: 0.3rem 0.6rem;
-            border: 1px solid rgba(184, 134, 11, 0.3);
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 12px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-        
-        .rabbi-action-btn:hover {
-            background: var(--synagogue-gold);
-            color: white;
-            border-color: var(--synagogue-gold);
-        }
-        
-        .rabbi-action-btn.copied {
-            background: #28a745;
-            color: white;
-            border-color: #28a745;
-        }
-        
-        .rabbi-action-btn.saved {
-            background: var(--torah-blue);
-            color: white;
-            border-color: var(--torah-blue);
-        }
-        
-        /* Suggested Prompts */
-        .rabbi-suggestions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            padding: 0.75rem;
-            background: rgba(184, 134, 11, 0.05);
-            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
-        }
-        
-        .rabbi-suggestion-btn {
-            padding: 0.4rem 0.75rem;
-            border: 1px solid rgba(184, 134, 11, 0.4);
-            background: white;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: var(--torah-blue);
-        }
-        
-        .rabbi-suggestion-btn:hover {
-            background: var(--synagogue-gold);
-            color: white;
-            border-color: var(--synagogue-gold);
-            transform: translateY(-1px);
-        }
-        
-        /* Font Size Toggle */
-        .rabbi-font-toggle {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            margin-left: auto;
-        }
-        
-        .rabbi-font-btn {
-            width: 24px;
-            height: 24px;
-            border: 1px solid rgba(184, 134, 11, 0.3);
-            background: white;
-            border-radius: 50%;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.7rem;
-            transition: all 0.2s;
-        }
-        
-        .rabbi-font-btn:hover {
-            background: var(--synagogue-gold);
-            color: white;
-        }
-        
-        .rabbi-font-btn.active {
-            background: var(--torah-blue);
-            color: white;
-        }
-        
-        /* Font size classes */
-        .rabbi-messages.font-small .rabbi-message p { font-size: 0.85rem; }
-        .rabbi-messages.font-medium .rabbi-message p { font-size: 1rem; }
-        .rabbi-messages.font-large .rabbi-message p { font-size: 1.15rem; line-height: 1.7; }
-        
-        /* Saved Messages Panel */
-        .rabbi-saved-panel {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, #FEFDF8 0%, #FFF8DC 100%);
-            z-index: 10;
-            display: none;
-            flex-direction: column;
-        }
-        
-        .rabbi-saved-panel.open {
-            display: flex;
-        }
-        
-        .rabbi-saved-header {
-            background: var(--gradient-torah);
-            color: white;
-            padding: 1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .rabbi-saved-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-        
-        .rabbi-saved-item {
-            background: white;
-            border: 1px solid rgba(184, 134, 11, 0.3);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .rabbi-saved-item:hover {
-            border-color: var(--synagogue-gold);
-            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.2);
-        }
-        
-        /* Clear Conversation Button */
-        .rabbi-clear-btn {
-            background: rgba(220, 53, 69, 0.1);
-            border: 1px solid rgba(220, 53, 69, 0.3);
-            color: #dc3545;
-            padding: 0.4rem 0.75rem;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .rabbi-clear-btn:hover {
-            background: #dc3545;
-            color: white;
-        }
-
-        /* ═══════════════════════════════════════════════════════════════
            📿 DAILY INSPIRATION PANEL
            ═══════════════════════════════════════════════════════════════ */
         .daily-panel {
@@ -3842,38 +3571,21 @@
                 <button class="rabbi-tool-btn" id="langHeBtn">
                     🇮🇱 עברית
                 </button>
+                <button class="rabbi-tool-btn" id="translateBtn" title="Translate last message">
+                    🔄 Translate
+                </button>
                 <button class="rabbi-tool-btn torah-portion-btn" id="torahPortionBtn" title="This week's Torah portion" onclick="window.loadTorahPortion()">
                     📜 Parasha
                 </button>
-                <button class="rabbi-clear-btn" id="clearChatBtn" title="Clear conversation" onclick="window.clearRabbiChat()">
-                    🗑️ Clear
-                </button>
-                <div class="rabbi-font-toggle">
-                    <button class="rabbi-font-btn" onclick="window.setRabbiFontSize('small')" title="Small text">A</button>
-                    <button class="rabbi-font-btn active" onclick="window.setRabbiFontSize('medium')" title="Medium text">A</button>
-                    <button class="rabbi-font-btn" onclick="window.setRabbiFontSize('large')" title="Large text">A</button>
+                <div class="rabbi-speed-toggle" style="display:flex;align-items:center;gap:4px;margin-left:auto;padding-left:8px;border-left:1px solid rgba(184,134,11,0.3);">
+                    <span style="font-size:0.7rem;color:#666;">🔊</span>
+                    <button class="rabbi-speed-btn" onclick="window.setSpeechSpeed(0.7)" title="Slow speech" style="width:26px;height:22px;border:1px solid rgba(184,134,11,0.3);background:white;border-radius:4px;cursor:pointer;font-size:0.65rem;color:#666;">🐢</button>
+                    <button class="rabbi-speed-btn active" onclick="window.setSpeechSpeed(1.0)" title="Normal speed" style="width:26px;height:22px;border:1px solid #0F52BA;background:#0F52BA;color:white;border-radius:4px;cursor:pointer;font-size:0.65rem;">1x</button>
+                    <button class="rabbi-speed-btn" onclick="window.setSpeechSpeed(1.4)" title="Fast speech" style="width:26px;height:22px;border:1px solid rgba(184,134,11,0.3);background:white;border-radius:4px;cursor:pointer;font-size:0.65rem;color:#666;">🐇</button>
                 </div>
             </div>
             
-            <!-- Response Mode Toggle -->
-            <div class="rabbi-toolbar" style="padding-top: 0;">
-                <span style="font-size: 0.75rem; color: #666; margin-right: 0.25rem;">Response:</span>
-                <div class="rabbi-mode-toggle">
-                    <button class="rabbi-mode-btn" id="modeQuick" onclick="window.setResponseMode('quick')" title="Brief 1-2 paragraph answer">⚡ Quick</button>
-                    <button class="rabbi-mode-btn active" id="modeDetailed" onclick="window.setResponseMode('detailed')" title="Thoughtful 3-4 paragraph answer">📝 Detailed</button>
-                    <button class="rabbi-mode-btn" id="modeDeep" onclick="window.setResponseMode('deep')" title="Comprehensive scholarly teaching">📚 Deep Scholar</button>
-                </div>
-            </div>
-            
-            <!-- Suggested Prompts -->
-            <div class="rabbi-suggestions" id="rabbiSuggestions">
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What does the Torah teach about finding purpose in retirement?')">🎯 Purpose in Retirement</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('How can I start studying Torah as a beginner?')">📖 Torah Study</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What chesed projects are meaningful for someone my age?')">💝 Chesed Ideas</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('Tell me a story of wisdom from the Talmud')">📜 Talmud Story</button>
-            </div>
-            
-            <div class="rabbi-messages font-medium" id="rabbiMessages">
+            <div class="rabbi-messages" id="rabbiMessages">
                 <div class="rabbi-message rabbi">
                     <p>Shalom, shalom! I am Rabbi Moshe ben David. It brings me such nachas (joy) to speak with you, Dr. Goldstein.</p>
                     <p>Whether you seek wisdom from Torah, guidance on your sacred pathways, questions about Jewish holidays, history, or simply want to schmooze - I am here for you.</p>
@@ -3890,17 +3602,6 @@
                 <button class="rabbi-send-btn" id="rabbiSendBtn" title="Send message" onclick="window.sendRabbiMessage()">
                     ➤
                 </button>
-            </div>
-            
-            <!-- Saved Messages Panel (hidden by default) -->
-            <div class="rabbi-saved-panel" id="rabbiSavedPanel">
-                <div class="rabbi-saved-header">
-                    <h3>📚 Saved Teachings</h3>
-                    <button onclick="window.closeSavedPanel()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">✕</button>
-                </div>
-                <div class="rabbi-saved-list" id="rabbiSavedList">
-                    <!-- Saved messages will appear here -->
-                </div>
             </div>
         </div>
     </div>
@@ -3930,181 +3631,16 @@
             console.log('📊 After toggle display:', window.getComputedStyle(chatWindow).display);
             console.log('Chat window open state:', chatWindow.classList.contains('open'));
             
-            // FORCE display with !important to override any CSS
+            // FORCE display as backup
             if (chatWindow.classList.contains('open')) {
-                chatWindow.style.setProperty('display', 'flex', 'important');
-                chatWindow.style.setProperty('visibility', 'visible', 'important');
-                chatWindow.style.setProperty('opacity', '1', 'important');
-                chatWindow.style.setProperty('z-index', '999999', 'important');
-                chatWindow.style.setProperty('pointer-events', 'auto', 'important');
-                // Force position to ensure it's on screen
-                chatWindow.style.setProperty('position', 'fixed', 'important');
-                chatWindow.style.setProperty('bottom', '100px', 'important');
-                chatWindow.style.setProperty('right', '20px', 'important');
-                chatWindow.style.setProperty('width', '420px', 'important');
-                chatWindow.style.setProperty('height', '600px', 'important');
-                console.log('✅ FORCED all styles with !important');
-                console.log('📐 Size check - width:', chatWindow.offsetWidth, 'height:', chatWindow.offsetHeight);
+                chatWindow.style.display = 'flex';
+                chatWindow.style.zIndex = '999999';
+                console.log('✅ FORCED display:flex and z-index');
                 var input = document.getElementById('rabbiInput');
                 if (input) input.focus();
             } else {
-                chatWindow.style.setProperty('display', 'none', 'important');
+                chatWindow.style.display = 'none';
             }
-        };
-        
-        // Response mode (quick, detailed, deep)
-        window.rabbiResponseMode = 'detailed';
-        window.rabbiAbortController = null;
-        window.rabbiLastQuestion = '';
-        window.rabbiSavedMessages = JSON.parse(localStorage.getItem('rabbiSavedMessages') || '[]');
-        
-        // Play sound effect
-        window.playRabbiSound = function(type) {
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                if (type === 'start') {
-                    oscillator.frequency.value = 440;
-                    gainNode.gain.value = 0.1;
-                } else if (type === 'complete') {
-                    oscillator.frequency.value = 523;
-                    gainNode.gain.value = 0.15;
-                }
-                
-                oscillator.start();
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
-                oscillator.stop(audioCtx.currentTime + 0.3);
-            } catch (e) {
-                console.log('Sound not available');
-            }
-        };
-        
-        // Set response mode
-        window.setResponseMode = function(mode) {
-            window.rabbiResponseMode = mode;
-            document.querySelectorAll('.rabbi-mode-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('mode' + mode.charAt(0).toUpperCase() + mode.slice(1)).classList.add('active');
-            console.log('📊 Response mode set to:', mode);
-        };
-        
-        // Set font size
-        window.setRabbiFontSize = function(size) {
-            const messagesDiv = document.getElementById('rabbiMessages');
-            messagesDiv.classList.remove('font-small', 'font-medium', 'font-large');
-            messagesDiv.classList.add('font-' + size);
-            document.querySelectorAll('.rabbi-font-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-        };
-        
-        // Clear chat
-        window.clearRabbiChat = function() {
-            if (confirm('Clear all messages? Your saved teachings will be preserved.')) {
-                const messagesDiv = document.getElementById('rabbiMessages');
-                messagesDiv.innerHTML = `
-                    <div class="rabbi-message rabbi">
-                        <p>Shalom! I am ready for a fresh conversation. What would you like to discuss?</p>
-                        <button class="speaker-btn" onclick="window.speakMessage(this.parentElement)">🔊</button>
-                    </div>
-                `;
-                window.rabbiConversationHistory = [];
-            }
-        };
-        
-        // Ask rabbi (from suggestion buttons)
-        window.askRabbi = function(question) {
-            document.getElementById('rabbiInput').value = question;
-            window.sendRabbiMessage();
-        };
-        
-        // Stop generation
-        window.stopRabbiGeneration = function() {
-            if (window.rabbiAbortController) {
-                window.rabbiAbortController.abort();
-                window.rabbiAbortController = null;
-                console.log('🛑 Generation stopped');
-                
-                // Remove loading indicator
-                const loading = document.getElementById('rabbiLoadingIndicator');
-                if (loading) loading.remove();
-                
-                // Add stopped message
-                const messagesDiv = document.getElementById('rabbiMessages');
-                const stoppedDiv = document.createElement('div');
-                stoppedDiv.className = 'rabbi-message rabbi';
-                stoppedDiv.innerHTML = '<p><em>Response stopped. Feel free to ask another question.</em></p>';
-                messagesDiv.appendChild(stoppedDiv);
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            }
-        };
-        
-        // Create action buttons for a message
-        window.createMessageActions = function(messageDiv, responseText, isRabbi) {
-            if (!isRabbi) return;
-            
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'rabbi-message-actions';
-            
-            // Speaker button
-            const speakerBtn = document.createElement('button');
-            speakerBtn.className = 'rabbi-action-btn';
-            speakerBtn.innerHTML = '🔊 Listen';
-            speakerBtn.onclick = function() { window.speakMessage(messageDiv); };
-            actionsDiv.appendChild(speakerBtn);
-            
-            // Copy button
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'rabbi-action-btn';
-            copyBtn.innerHTML = '📋 Copy';
-            copyBtn.onclick = function() {
-                navigator.clipboard.writeText(responseText).then(() => {
-                    copyBtn.innerHTML = '✓ Copied!';
-                    copyBtn.classList.add('copied');
-                    setTimeout(() => {
-                        copyBtn.innerHTML = '📋 Copy';
-                        copyBtn.classList.remove('copied');
-                    }, 2000);
-                });
-            };
-            actionsDiv.appendChild(copyBtn);
-            
-            // Save button
-            const saveBtn = document.createElement('button');
-            saveBtn.className = 'rabbi-action-btn';
-            saveBtn.innerHTML = '⭐ Save';
-            saveBtn.onclick = function() {
-                const saved = {
-                    text: responseText,
-                    date: new Date().toLocaleDateString(),
-                    question: window.rabbiLastQuestion
-                };
-                window.rabbiSavedMessages.push(saved);
-                localStorage.setItem('rabbiSavedMessages', JSON.stringify(window.rabbiSavedMessages));
-                saveBtn.innerHTML = '✓ Saved!';
-                saveBtn.classList.add('saved');
-                setTimeout(() => {
-                    saveBtn.innerHTML = '⭐ Save';
-                    saveBtn.classList.remove('saved');
-                }, 2000);
-            };
-            actionsDiv.appendChild(saveBtn);
-            
-            // Regenerate button
-            const regenBtn = document.createElement('button');
-            regenBtn.className = 'rabbi-action-btn';
-            regenBtn.innerHTML = '🔄 Regenerate';
-            regenBtn.onclick = function() {
-                if (window.rabbiLastQuestion) {
-                    document.getElementById('rabbiInput').value = window.rabbiLastQuestion;
-                    window.sendRabbiMessage();
-                }
-            };
-            actionsDiv.appendChild(regenBtn);
-            
-            messageDiv.appendChild(actionsDiv);
         };
         
         window.sendRabbiMessage = async function() {
@@ -4118,9 +3654,6 @@
                 return;
             }
             
-            // Save for regenerate
-            window.rabbiLastQuestion = message;
-            
             var messagesDiv = document.getElementById('rabbiMessages');
             
             // Add user message to chat
@@ -4132,52 +3665,33 @@
             input.value = '';
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             
-            // Play start sound
-            window.playRabbiSound('start');
-            
-            // Show enhanced loading indicator with spinner and stop button
-            var loadingDiv = document.createElement('div');
-            loadingDiv.className = 'rabbi-loading-container';
-            loadingDiv.id = 'rabbiLoadingIndicator';
-            loadingDiv.innerHTML = `
-                <div class="rabbi-loading-spinner">
-                    <div class="rabbi-spinner"></div>
-                    <span class="rabbi-loading-text">Rabbi Moshe is contemplating your question...</span>
-                </div>
-                <button class="rabbi-stop-btn" onclick="window.stopRabbiGeneration()">
-                    ⏹️ Stop
-                </button>
-            `;
-            messagesDiv.appendChild(loadingDiv);
+            // Show typing indicator
+            var typingDiv = document.createElement('div');
+            typingDiv.className = 'rabbi-typing';
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = '<span></span><span></span><span></span>';
+            messagesDiv.appendChild(typingDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             
-            // Create abort controller for stop functionality
-            window.rabbiAbortController = new AbortController();
-            
             try {
-                console.log('🌐 Calling rabbi API with mode:', window.rabbiResponseMode);
+                console.log('🌐 Calling rabbi API...');
                 var response = await fetch('/.netlify/functions/rabbi', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         text: message,
                         message: message,
-                        conversationHistory: window.rabbiConversationHistory,
-                        responseMode: window.rabbiResponseMode
-                    }),
-                    signal: window.rabbiAbortController.signal
+                        conversationHistory: window.rabbiConversationHistory
+                    })
                 });
                 
                 console.log('📡 API response status:', response.status);
                 var data = await response.json();
                 console.log('📦 API data:', data);
                 
-                // Remove loading indicator
-                var loading = document.getElementById('rabbiLoadingIndicator');
-                if (loading) loading.remove();
-                
-                // Play completion sound
-                window.playRabbiSound('complete');
+                // Remove typing indicator
+                var typing = document.getElementById('typingIndicator');
+                if (typing) typing.remove();
                 
                 // Add rabbi response
                 var rabbiDiv = document.createElement('div');
@@ -4185,8 +3699,14 @@
                 var responseText = data.response || data.error || 'I apologize, something went wrong.';
                 rabbiDiv.innerHTML = '<p>' + responseText.replace(/\n/g, '<br>') + '</p>';
                 
-                // Add action buttons (speaker, copy, save, regenerate)
-                window.createMessageActions(rabbiDiv, responseText, true);
+                // Add speaker button
+                var speakerBtn = document.createElement('button');
+                speakerBtn.className = 'speaker-btn';
+                speakerBtn.innerHTML = '🔊';
+                speakerBtn.onclick = function() {
+                    if (window.speakMessage) window.speakMessage(rabbiDiv);
+                };
+                rabbiDiv.appendChild(speakerBtn);
                 
                 messagesDiv.appendChild(rabbiDiv);
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -4195,204 +3715,18 @@
                 window.rabbiConversationHistory.push({ role: 'user', content: message });
                 window.rabbiConversationHistory.push({ role: 'assistant', content: responseText });
                 
-                // Clear abort controller
-                window.rabbiAbortController = null;
-                
             } catch (error) {
-                if (error.name === 'AbortError') {
-                    console.log('🛑 Request was aborted');
-                    return;
-                }
                 console.error('❌ Rabbi API error:', error);
-                var loading = document.getElementById('rabbiLoadingIndicator');
-                if (loading) loading.remove();
+                var typing = document.getElementById('typingIndicator');
+                if (typing) typing.remove();
                 
                 var errorDiv = document.createElement('div');
                 errorDiv.className = 'rabbi-message rabbi';
                 errorDiv.innerHTML = '<p>I apologize, but I am having trouble connecting. Please try again.</p>';
                 messagesDiv.appendChild(errorDiv);
-                
-                window.rabbiAbortController = null;
             }
         };
         
-        // Saved panel functions
-        window.openSavedPanel = function() {
-            document.getElementById('rabbiSavedPanel').classList.add('open');
-            window.renderSavedMessages();
-        };
-        
-        window.closeSavedPanel = function() {
-            document.getElementById('rabbiSavedPanel').classList.remove('open');
-        };
-        
-        window.renderSavedMessages = function() {
-            const list = document.getElementById('rabbiSavedList');
-            if (window.rabbiSavedMessages.length === 0) {
-                list.innerHTML = '<p style="text-align:center;color:#666;padding:2rem;">No saved teachings yet. Click ⭐ Save on any response to save it here.</p>';
-                return;
-            }
-            list.innerHTML = window.rabbiSavedMessages.map((msg, i) => `
-                <div class="rabbi-saved-item" onclick="alert('${msg.text.substring(0, 200).replace(/'/g, "\\'")}...')">
-                    <strong>${msg.question || 'Teaching'}</strong>
-                    <p style="font-size:0.85rem;color:#666;margin:0.5rem 0 0 0;">${msg.date} - ${msg.text.substring(0, 100)}...</p>
-                </div>
-            `).join('');
-        };
-        
-        // ═══════════════════════════════════════════════════════════════
-        // 🔊 EARLY FUNCTION DEFINITIONS (so onclick handlers work immediately)
-        // ═══════════════════════════════════════════════════════════════
-        
-        // speakMessage - Text-to-Speech
-        window.speakMessage = function(messageElement) {
-            console.log('🔊 speakMessage called');
-            try {
-                const text = messageElement.innerText || messageElement.textContent;
-                if (!text) {
-                    console.log('No text to speak');
-                    return;
-                }
-                
-                // Cancel any ongoing speech
-                window.speechSynthesis.cancel();
-                
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.9;
-                utterance.pitch = 1.0;
-                utterance.volume = 1.0;
-                
-                // Try to get a good English voice
-                const voices = window.speechSynthesis.getVoices();
-                const englishVoice = voices.find(v => v.lang.startsWith('en') && v.name.includes('Google')) ||
-                                    voices.find(v => v.lang.startsWith('en'));
-                if (englishVoice) utterance.voice = englishVoice;
-                
-                window.speechSynthesis.speak(utterance);
-                console.log('🔊 Speaking:', text.substring(0, 50) + '...');
-            } catch (error) {
-                console.error('Speech error:', error);
-                alert('Text-to-speech is not available in this browser.');
-            }
-        };
-        
-        // toggleFullscreen - Expand/collapse rabbi chat window
-        window.toggleFullscreen = function() {
-            console.log('⛶ toggleFullscreen called');
-            const chatWindow = document.getElementById('rabbiChatWindow');
-            const fullscreenBtn = document.getElementById('fullscreenBtn');
-            const toggleBtn = document.getElementById('rabbiToggleBtn');
-            
-            if (!chatWindow) {
-                console.error('Chat window not found');
-                return;
-            }
-            
-            chatWindow.classList.toggle('fullscreen');
-            
-            if (chatWindow.classList.contains('fullscreen')) {
-                if (fullscreenBtn) {
-                    fullscreenBtn.innerHTML = '⛶';
-                    fullscreenBtn.title = 'Exit fullscreen';
-                }
-                if (toggleBtn) toggleBtn.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-            } else {
-                if (fullscreenBtn) {
-                    fullscreenBtn.innerHTML = '⛶';
-                    fullscreenBtn.title = 'Expand to fullscreen';
-                }
-                if (toggleBtn) toggleBtn.style.display = 'flex';
-                document.body.style.overflow = '';
-            }
-            
-            const input = document.getElementById('rabbiInput');
-            if (input) input.focus();
-        };
-        
-        // loadTorahPortion - Load this week's Parsha
-        window.loadTorahPortion = async function() {
-            console.log('📜 loadTorahPortion called');
-            const messagesDiv = document.getElementById('rabbiMessages');
-            
-            // Show loading message
-            const loadingMsg = document.createElement('div');
-            loadingMsg.className = 'rabbi-message rabbi';
-            loadingMsg.id = 'parshaLoadingMsg';
-            loadingMsg.innerHTML = '<p>📜 Let me prepare a comprehensive teaching on this week\'s Torah portion...</p>';
-            messagesDiv.appendChild(loadingMsg);
-            
-            // Show spinner
-            var loadingDiv = document.createElement('div');
-            loadingDiv.className = 'rabbi-loading-container';
-            loadingDiv.id = 'parshaLoadingIndicator';
-            loadingDiv.innerHTML = '<div class="rabbi-loading-spinner"><div class="rabbi-spinner"></div><span class="rabbi-loading-text">Rabbi Moshe is preparing the Parsha teaching...</span></div>';
-            messagesDiv.appendChild(loadingDiv);
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            
-            if (window.playRabbiSound) window.playRabbiSound('start');
-            
-            try {
-                const today = new Date();
-                const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
-                
-                const torahPrompt = `Today is ${dateStr}. Please provide a COMPREHENSIVE teaching on this week's Torah portion (Parashat HaShavua). Include: the parasha name in Hebrew and English, chapters/verses, detailed summary, commentary from Rashi and Ramban, Chassidic insights, relevant Midrashim, life lessons for a retired physician, connections to chesed and tikkun olam, and a meaningful blessing. Make this equivalent to a full Shabbat sermon.`;
-                
-                const response = await fetch('/.netlify/functions/rabbi', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        text: torahPrompt,
-                        message: torahPrompt,
-                        conversationHistory: [],
-                        responseMode: 'deep'
-                    })
-                });
-                
-                // Remove loading elements
-                const loadingMsgEl = document.getElementById('parshaLoadingMsg');
-                if (loadingMsgEl) loadingMsgEl.remove();
-                const loadingIndicator = document.getElementById('parshaLoadingIndicator');
-                if (loadingIndicator) loadingIndicator.remove();
-                
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                
-                const data = await response.json();
-                if (window.playRabbiSound) window.playRabbiSound('complete');
-                
-                if (data.error) {
-                    const errorDiv = document.createElement('div');
-                    errorDiv.className = 'rabbi-message rabbi';
-                    errorDiv.innerHTML = '<p>📜 I apologize, but I encountered an error. Please try again.</p>';
-                    messagesDiv.appendChild(errorDiv);
-                } else {
-                    const rabbiDiv = document.createElement('div');
-                    rabbiDiv.className = 'rabbi-message rabbi';
-                    rabbiDiv.innerHTML = '<p>' + data.response.replace(/\n/g, '<br>') + '</p>';
-                    if (window.createMessageActions) window.createMessageActions(rabbiDiv, data.response, true);
-                    messagesDiv.appendChild(rabbiDiv);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    
-                    window.rabbiConversationHistory.push({ role: 'user', content: 'Tell me about this week\'s Torah portion' });
-                    window.rabbiConversationHistory.push({ role: 'assistant', content: data.response });
-                }
-            } catch (error) {
-                console.error('Torah portion error:', error);
-                const loadingMsgEl = document.getElementById('parshaLoadingMsg');
-                if (loadingMsgEl) loadingMsgEl.remove();
-                const loadingIndicator = document.getElementById('parshaLoadingIndicator');
-                if (loadingIndicator) loadingIndicator.remove();
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'rabbi-message rabbi';
-                errorDiv.innerHTML = '<p>📜 I apologize, but I encountered an error. Please try again.</p>';
-                messagesDiv.appendChild(errorDiv);
-            }
-        };
-        
-        console.log('✅ speakMessage is now:', typeof window.speakMessage);
-        console.log('✅ toggleFullscreen is now:', typeof window.toggleFullscreen);
-        console.log('✅ loadTorahPortion is now:', typeof window.loadTorahPortion);
         console.log('✅ toggleRabbiChat is now:', typeof window.toggleRabbiChat);
         console.log('✅ sendRabbiMessage is now:', typeof window.sendRabbiMessage);
     </script>
@@ -4422,8 +3756,41 @@
         let isRecording = false;
         let mediaRecorder = null;
         let speechRecognition = null;
+        
+        // Stop Rabbi generation (abort in-progress API calls)
+        window.stopRabbiGeneration = function() {
+            console.log('🛑 stopRabbiGeneration called');
+            if (window.rabbiAbortController) {
+                window.rabbiAbortController.abort();
+                window.rabbiAbortController = null;
+            }
+            // Remove loading indicators
+            const loadingMsg = document.getElementById('parshaLoadingMsg');
+            if (loadingMsg) loadingMsg.remove();
+            const loadingIndicator = document.getElementById('parshaLoadingIndicator');
+            if (loadingIndicator) loadingIndicator.remove();
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) typingIndicator.remove();
+            
+            // Add cancelled message
+            const messagesDiv = document.getElementById('rabbiMessages');
+            if (messagesDiv) {
+                const cancelDiv = document.createElement('div');
+                cancelDiv.className = 'rabbi-message rabbi';
+                cancelDiv.innerHTML = '<p><em>Generation stopped.</em></p>';
+                messagesDiv.appendChild(cancelDiv);
+            }
+        };
 
-        // toggleRabbiChat is defined earlier in the file (line 3610) - DO NOT REDEFINE HERE
+        // Define GLOBALLY on window object to ensure availability
+        window.toggleRabbiChat = function() {
+            console.log('🕎 toggleRabbiChat CALLED!');
+            const chatWindow = document.getElementById('rabbiChatWindow');
+            chatWindow.classList.toggle('open');
+            if (chatWindow.classList.contains('open')) {
+                document.getElementById('rabbiInput').focus();
+            }
+        }
 
         function toggleRabbiFullscreen() {
             const chatWindow = document.getElementById('rabbiChatWindow');
@@ -4627,58 +3994,115 @@
                     audio.onerror = (e) => {
                         console.log('Audio playback error:', e);
                         URL.revokeObjectURL(audioUrl);
-                        useBrowserTTS(text, speakerBtn);
+                        useBrowserTTS(text, speakerBtn, messageElement);
                     };
                     
                     await audio.play();
                 } catch (playError) {
                     console.log('Audio processing failed:', playError);
-                    useBrowserTTS(text, speakerBtn);
+                    useBrowserTTS(text, speakerBtn, messageElement);
                 }
             } catch (error) {
                 console.log('TTS fetch error:', error);
-                useBrowserTTS(text, speakerBtn);
+                useBrowserTTS(text, speakerBtn, messageElement);
             }
         }
         
-        function useBrowserTTS(text, speakerBtn) {
+        // Speech speed control (0.7=slow, 1.0=normal, 1.4=fast)
+        window.rabbiSpeechRate = 1.0;
+        window.rabbiSpeechQueue = [];
+        window.rabbiIsSpeaking = false;
+        window.rabbiCurrentSpeakerBtn = null;
+        window.rabbiCurrentMessageEl = null;
+        
+        window.setSpeechSpeed = function(speed) {
+            window.rabbiSpeechRate = speed;
+            document.querySelectorAll('.rabbi-speed-btn').forEach(function(btn) { btn.classList.remove('active'); });
+            if (event && event.target) event.target.classList.add('active');
+            console.log('🔊 Speech speed set to:', speed);
+        };
+        
+        window.stopSpeech = function() {
+            speechSynthesis.cancel();
+            window.rabbiSpeechQueue = [];
+            window.rabbiIsSpeaking = false;
+            if (window.rabbiCurrentSpeakerBtn) {
+                window.rabbiCurrentSpeakerBtn.innerHTML = '🔊';
+                window.rabbiCurrentSpeakerBtn.disabled = false;
+                if (window.rabbiCurrentMessageEl) {
+                    window.rabbiCurrentSpeakerBtn.onclick = function() { window.speakMessage(window.rabbiCurrentMessageEl); };
+                }
+            }
+            console.log('🔇 Speech stopped');
+        };
+        
+        function splitIntoChunks(text, maxLength) {
+            maxLength = maxLength || 200;
+            var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+            var chunks = [];
+            var currentChunk = '';
+            for (var i = 0; i < sentences.length; i++) {
+                if (currentChunk.length + sentences[i].length <= maxLength) {
+                    currentChunk += sentences[i];
+                } else {
+                    if (currentChunk) chunks.push(currentChunk.trim());
+                    currentChunk = sentences[i];
+                }
+            }
+            if (currentChunk) chunks.push(currentChunk.trim());
+            return chunks;
+        }
+        
+        function speakChunk(text, onEnd) {
+            var utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
+            utterance.rate = window.rabbiSpeechRate;
+            utterance.pitch = 0.9;
+            var voices = speechSynthesis.getVoices();
+            var preferredVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David'))) || voices.find(v => v.lang.startsWith('en'));
+            if (preferredVoice) utterance.voice = preferredVoice;
+            utterance.onend = onEnd;
+            utterance.onerror = onEnd;
+            speechSynthesis.speak(utterance);
+        }
+        
+        function processSpeechQueue() {
+            if (window.rabbiSpeechQueue.length === 0) {
+                window.rabbiIsSpeaking = false;
+                if (window.rabbiCurrentSpeakerBtn) {
+                    window.rabbiCurrentSpeakerBtn.innerHTML = '🔊';
+                    window.rabbiCurrentSpeakerBtn.disabled = false;
+                    if (window.rabbiCurrentMessageEl) {
+                        window.rabbiCurrentSpeakerBtn.onclick = function() { window.speakMessage(window.rabbiCurrentMessageEl); };
+                    }
+                }
+                return;
+            }
+            var chunk = window.rabbiSpeechQueue.shift();
+            speakChunk(chunk, processSpeechQueue);
+        }
+        
+        function useBrowserTTS(text, speakerBtn, messageElement) {
             if ('speechSynthesis' in window) {
                 speechSynthesis.cancel();
+                window.rabbiSpeechQueue = [];
                 
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
-                utterance.rate = 0.85;
-                utterance.pitch = 0.9;
+                // Store references for stop functionality
+                window.rabbiCurrentSpeakerBtn = speakerBtn;
+                window.rabbiCurrentMessageEl = messageElement;
                 
-                // Try to find a good voice
-                const voices = speechSynthesis.getVoices();
-                if (voices.length === 0) {
-                    // Voices not loaded yet, wait and try again
-                    speechSynthesis.onvoiceschanged = () => {
-                        const newVoices = speechSynthesis.getVoices();
-                        const preferredVoice = newVoices.find(v => 
-                            v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'))
-                        ) || newVoices.find(v => v.lang.startsWith('en'));
-                        if (preferredVoice) utterance.voice = preferredVoice;
-                    };
-                } else {
-                    const preferredVoice = voices.find(v => 
-                        v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'))
-                    ) || voices.find(v => v.lang.startsWith('en'));
-                    if (preferredVoice) utterance.voice = preferredVoice;
-                }
+                // Change button to stop
+                speakerBtn.innerHTML = '⏹️ Stop';
+                speakerBtn.disabled = false;
+                speakerBtn.onclick = function() { window.stopSpeech(); };
                 
-                utterance.onend = () => {
-                    speakerBtn.innerHTML = '🔊';
-                    speakerBtn.disabled = false;
-                };
+                // Split into chunks to avoid 35-second cutoff
+                var chunks = splitIntoChunks(text, 200);
+                console.log('🔊 Speaking ' + chunks.length + ' chunks at speed ' + window.rabbiSpeechRate);
                 
-                utterance.onerror = () => {
-                    speakerBtn.innerHTML = '🔊';
-                    speakerBtn.disabled = false;
-                };
-                
-                speechSynthesis.speak(utterance);
+                window.rabbiSpeechQueue = chunks;
+                window.rabbiIsSpeaking = true;
+                processSpeechQueue();
             } else {
                 speakerBtn.innerHTML = '🔊';
                 speakerBtn.disabled = false;
@@ -4693,16 +4117,59 @@
         // 🔲 FULLSCREEN TOGGLE
         // ═══════════════════════════════════════════════════════════════
         function toggleFullscreen() {
+            console.log('⛶ toggleFullscreen called');
             const chatWindow = document.getElementById('rabbiChatWindow');
             const fullscreenBtn = document.getElementById('fullscreenBtn');
-            if (chatWindow) {
-                chatWindow.classList.toggle('fullscreen');
-                if (fullscreenBtn) {
-                    fullscreenBtn.innerHTML = chatWindow.classList.contains('fullscreen') ? '⛶' : '⛶';
-                    fullscreenBtn.title = chatWindow.classList.contains('fullscreen') ? 'Exit fullscreen' : 'Expand to fullscreen';
-                }
-                console.log('Fullscreen toggled:', chatWindow.classList.contains('fullscreen'));
+            const toggleBtn = document.getElementById('rabbiToggleBtn');
+            
+            if (!chatWindow) {
+                console.error('Chat window not found');
+                return;
             }
+            
+            chatWindow.classList.toggle('fullscreen');
+            
+            if (chatWindow.classList.contains('fullscreen')) {
+                // Going fullscreen - force all properties
+                chatWindow.style.setProperty('position', 'fixed', 'important');
+                chatWindow.style.setProperty('top', '0', 'important');
+                chatWindow.style.setProperty('left', '0', 'important');
+                chatWindow.style.setProperty('right', '0', 'important');
+                chatWindow.style.setProperty('bottom', '0', 'important');
+                chatWindow.style.setProperty('width', '100vw', 'important');
+                chatWindow.style.setProperty('height', '100vh', 'important');
+                chatWindow.style.setProperty('max-height', '100vh', 'important');
+                chatWindow.style.setProperty('border-radius', '0', 'important');
+                chatWindow.style.setProperty('z-index', '100000', 'important');
+                if (fullscreenBtn) {
+                    fullscreenBtn.innerHTML = '⛶';
+                    fullscreenBtn.title = 'Exit fullscreen';
+                }
+                if (toggleBtn) toggleBtn.style.display = 'none';
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Exiting fullscreen - restore normal position
+                chatWindow.style.setProperty('position', 'fixed', 'important');
+                chatWindow.style.setProperty('bottom', '100px', 'important');
+                chatWindow.style.setProperty('right', '20px', 'important');
+                chatWindow.style.removeProperty('top');
+                chatWindow.style.removeProperty('left');
+                chatWindow.style.setProperty('width', '420px', 'important');
+                chatWindow.style.setProperty('height', '600px', 'important');
+                chatWindow.style.setProperty('max-height', 'calc(100vh - 140px)', 'important');
+                chatWindow.style.setProperty('border-radius', '25px', 'important');
+                chatWindow.style.setProperty('z-index', '999999', 'important');
+                if (fullscreenBtn) {
+                    fullscreenBtn.innerHTML = '⛶';
+                    fullscreenBtn.title = 'Expand to fullscreen';
+                }
+                if (toggleBtn) toggleBtn.style.display = 'flex';
+                document.body.style.overflow = '';
+            }
+            
+            const input = document.getElementById('rabbiInput');
+            if (input) input.focus();
+            console.log('Fullscreen toggled:', chatWindow.classList.contains('fullscreen'));
         }
         window.toggleFullscreen = toggleFullscreen;
         console.log('✅ toggleFullscreen is now:', typeof window.toggleFullscreen);
@@ -5086,88 +4553,45 @@
         // 📜 TORAH PORTION - Weekly Parasha with Deep Teaching
         // ═══════════════════════════════════════════════════════════════
         async function loadTorahPortion() {
-            // Show enhanced loading indicator
+            console.log('📜 loadTorahPortion called');
             const messagesDiv = document.getElementById('rabbiMessages');
             
+            // Show loading message
             const loadingMsg = document.createElement('div');
             loadingMsg.className = 'rabbi-message rabbi';
             loadingMsg.id = 'parshaLoadingMsg';
-            loadingMsg.innerHTML = '<p>📜 Let me prepare a comprehensive teaching on this week\'s Torah portion for you, Dr. Goldstein. This will take a moment as I gather wisdom from our sacred texts...</p>';
+            loadingMsg.innerHTML = '<p>📜 Let me prepare a comprehensive teaching on this week\'s Torah portion...</p>';
             messagesDiv.appendChild(loadingMsg);
             
-            // Show spinner
-            var loadingDiv = document.createElement('div');
+            // Show spinner with stop button
+            const loadingDiv = document.createElement('div');
             loadingDiv.className = 'rabbi-loading-container';
             loadingDiv.id = 'parshaLoadingIndicator';
-            loadingDiv.innerHTML = `
-                <div class="rabbi-loading-spinner">
-                    <div class="rabbi-spinner"></div>
-                    <span class="rabbi-loading-text">Rabbi Moshe is preparing a comprehensive Parsha teaching...</span>
-                </div>
-            `;
+            loadingDiv.innerHTML = '<div class="rabbi-loading-spinner"><div class="rabbi-spinner"></div><span class="rabbi-loading-text">Rabbi Moshe is preparing a comprehensive Parsha teaching...</span></div><button class="rabbi-stop-btn" onclick="window.stopRabbiGeneration()">⏹️ Stop</button>';
             messagesDiv.appendChild(loadingDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
             
-            // Play start sound
-            if (window.playRabbiSound) window.playRabbiSound('start');
+            // Create abort controller
+            window.rabbiAbortController = new AbortController();
             
             try {
-                // Get today's date for context
                 const today = new Date();
                 const dateStr = today.toLocaleDateString('en-US', { 
                     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' 
                 });
                 
-                // Ask Rabbi directly for comprehensive Torah portion teaching (3-5 pages)
-                const torahPrompt = `Today is ${dateStr}. Please provide a COMPREHENSIVE, IN-DEPTH teaching on this week's Torah portion (Parashat HaShavua). This should be equivalent to a full 3-5 page scholarly article or Shabbat sermon.
+                const torahPrompt = `Today is ${dateStr}. Please provide a comprehensive teaching on this week's Torah portion (Parashat HaShavua).
 
-As Rabbi Moshe ben David, please include ALL of the following sections in detail:
+As Rabbi Moshe ben David, please include:
 
-## 📖 THE PORTION
-- Name this week's parasha in Hebrew and English
-- Exact chapters and verses covered
-- Brief overview of where we are in the Torah narrative
+1. **📖 The Portion**: Name this week's parasha (in Hebrew and English) and what chapters/verses it covers
+2. **📜 Overview**: What is the main narrative and key events?
+3. **✨ Spiritual Insights**: Share deeper meanings from Rashi, Ramban, and other commentators
+4. **💡 Life Lessons**: How does this apply to a retired physician seeking meaning and purpose?
+5. **🕯️ Connection to Jewish Values**: How does this portion connect to chesed, tikkun olam, or Torah study?
+6. **🙏 Closing Blessing**: End with an appropriate blessing
 
-## 📜 DETAILED SUMMARY
-- Comprehensive retelling of the main narrative
-- All key events, dialogues, and turning points
-- Important characters and their roles
-
-## ✨ COMMENTARY FROM THE SAGES
-- Rashi's essential comments and insights
-- Ramban's philosophical perspectives
-- Sforno's ethical interpretations
-- Chassidic insights (Baal Shem Tov, Lubavitcher Rebbe)
-- Modern commentators' perspectives
-
-## 🔮 DEEPER MEANINGS
-- Mystical/Kabbalistic interpretations
-- Hidden meanings and numerical significance (gematria if relevant)
-- Symbolic elements and what they represent
-
-## 📚 STORIES & MIDRASHIM
-- Relevant Talmudic stories
-- Midrashic elaborations
-- Stories of how tzaddikim understood this portion
-
-## 💡 LIFE LESSONS FOR TODAY
-- Practical applications for daily life
-- How this applies to a retired physician seeking meaning
-- Connections to modern challenges and opportunities
-- Specific actions one can take based on this portion
-
-## 🕯️ CONNECTION TO JEWISH VALUES
-- Links to chesed (loving-kindness)
-- Links to tikkun olam (repairing the world)  
-- Links to Torah study and spiritual growth
-- How this portion guides us in serving others
-
-## 🙏 CLOSING
-- A meaningful blessing related to the parsha's themes
-- An inspiring call to action for the week ahead
-- A relevant quote from our sages to meditate upon
-
-Please make this truly comprehensive - imagine you are delivering this as a full Shabbat morning sermon followed by a study session. Use Hebrew/Yiddish terms with translations throughout. This is for deep learning and reflection.`;
+Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon.`;
 
                 const response = await fetch('/.netlify/functions/rabbi', {
                     method: 'POST',
@@ -5176,9 +4600,9 @@ Please make this truly comprehensive - imagine you are delivering this as a full
                         text: torahPrompt,
                         message: torahPrompt,
                         conversationHistory: [],
-                        responseMode: 'deep',  // Use deep mode for maximum length
                         language: currentLanguageMode
-                    })
+                    }),
+                    signal: window.rabbiAbortController.signal
                 });
 
                 // Remove loading elements
@@ -5193,37 +4617,30 @@ Please make this truly comprehensive - imagine you are delivering this as a full
 
                 const data = await response.json();
                 
-                // Play completion sound
-                if (window.playRabbiSound) window.playRabbiSound('complete');
-                
                 if (data.error) {
                     addMessageToChat('rabbi', '📜 I apologize, but I encountered an error. Please check your connection and try again.');
                 } else {
-                    // Create message with action buttons
-                    const rabbiDiv = document.createElement('div');
-                    rabbiDiv.className = 'rabbi-message rabbi';
-                    rabbiDiv.innerHTML = '<p>' + data.response.replace(/\n/g, '<br>').replace(/##\s*/g, '<strong>').replace(/\*\*/g, '') + '</p>';
-                    
-                    // Add action buttons
-                    if (window.createMessageActions) {
-                        window.createMessageActions(rabbiDiv, data.response, true);
-                    }
-                    
-                    messagesDiv.appendChild(rabbiDiv);
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    
+                    addMessageToChat('rabbi', data.response);
                     rabbiConversationHistory.push({ role: 'user', content: 'Tell me about this week\'s Torah portion' });
                     rabbiConversationHistory.push({ role: 'assistant', content: data.response });
                 }
+                
+                window.rabbiAbortController = null;
             } catch (error) {
-                // Remove loading elements
+                if (error.name === 'AbortError') {
+                    console.log('🛑 Parsha request was aborted');
+                    return;
+                }
+                
+                console.error('Torah portion error:', error);
+                
                 const loadingMsgEl = document.getElementById('parshaLoadingMsg');
                 if (loadingMsgEl) loadingMsgEl.remove();
                 const loadingIndicator = document.getElementById('parshaLoadingIndicator');
                 if (loadingIndicator) loadingIndicator.remove();
                 
-                console.error('Torah portion error:', error);
                 addMessageToChat('rabbi', '📜 I apologize, but I encountered an error. Please check your connection and try again.');
+                window.rabbiAbortController = null;
             }
         }
         window.loadTorahPortion = loadTorahPortion;
@@ -5235,13 +4652,11 @@ Please make this truly comprehensive - imagine you are delivering this as a full
         function initializeEventListeners() {
             console.log('🔗 Initializing event listeners...');
             
-            // Rabbi toggle button - DO NOT add addEventListener here!
-            // The button already has onclick="window.toggleRabbiChat()" in HTML
-            // Adding addEventListener causes DOUBLE firing (open then immediately close)
+            // Rabbi toggle buttons
             const rabbiToggleBtn = document.getElementById('rabbiToggleBtn');
             if (rabbiToggleBtn) {
-                // Just log that we found it, don't add another click handler!
-                console.log('✅ Rabbi toggle button found (using onclick handler)');
+                rabbiToggleBtn.addEventListener('click', toggleRabbiChat);
+                console.log('✅ Rabbi toggle button connected');
             } else {
                 console.error('❌ Rabbi toggle button not found!');
             }
