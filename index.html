@@ -3593,7 +3593,7 @@
                     🎤
                 </button>
                 <textarea class="rabbi-input" id="rabbiInput" placeholder="Ask the Rabbi anything about Judaism..." rows="1"></textarea>
-                <button class="rabbi-send-btn" id="rabbiSendBtn" title="Send message">
+                <button class="rabbi-send-btn" id="rabbiSendBtn" title="Send message" onclick="window.sendRabbiMessage()">
                     ➤
                 </button>
             </div>
@@ -3699,9 +3699,15 @@
         }
 
         async function sendRabbiMessage() {
+            console.log('📤 sendRabbiMessage CALLED!');
             const input = document.getElementById('rabbiInput');
-            const message = input.value.trim();
-            if (!message) return;
+            console.log('📝 Input element:', input);
+            const message = input ? input.value.trim() : '';
+            console.log('💬 Message:', message);
+            if (!message) {
+                console.log('⚠️ Empty message, returning');
+                return;
+            }
 
             // Add user message to chat
             addMessageToChat('user', message);
@@ -3738,9 +3744,14 @@
                 console.error('Rabbi API error:', error);
             }
         }
+        // Make sendRabbiMessage globally available
+        window.sendRabbiMessage = sendRabbiMessage;
+        console.log('✅ sendRabbiMessage is now:', typeof window.sendRabbiMessage);
 
         function addMessageToChat(role, content) {
+            console.log('📨 addMessageToChat called:', role, content?.substring(0, 50));
             const messagesDiv = document.getElementById('rabbiMessages');
+            console.log('📋 Messages div:', messagesDiv);
             const messageDiv = document.createElement('div');
             messageDiv.className = `rabbi-message ${role}`;
             
@@ -3763,6 +3774,7 @@
             messagesDiv.appendChild(messageDiv);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
+        window.addMessageToChat = addMessageToChat;
 
         function showTypingIndicator() {
             const messagesDiv = document.getElementById('rabbiMessages');
@@ -4296,15 +4308,4 @@
                 // Ask Rabbi directly for the Torah portion (he knows the calendar!)
                 const torahPrompt = `Today is ${dateStr}. Please provide a comprehensive teaching on this week's Torah portion (Parashat HaShavua).
 
-As Rabbi Moshe ben David, please include:
-
-1. **📖 The Portion**: Name this week's parasha (in Hebrew and English) and what chapters/verses it covers
-2. **📜 Overview**: What is the main narrative and key events?
-3. **✨ Spiritual Insights**: Share deeper meanings from Rashi, Ramban, and other commentators
-4. **💡 Life Lessons**: How does this apply to a retired physician seeking meaning and purpose?
-5. **🕯️ Connection to Jewish Values**: How does this portion connect to chesed, tikkun olam, or Torah study?
-6. **🙏 Closing Blessing**: End with an appropriate blessing
-
-Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon.`;
-
-                const respons
+As R
