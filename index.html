@@ -3625,15 +3625,25 @@
             console.log('📊 After toggle display:', window.getComputedStyle(chatWindow).display);
             console.log('Chat window open state:', chatWindow.classList.contains('open'));
             
-            // FORCE display as backup
+            // FORCE display with !important to override any CSS
             if (chatWindow.classList.contains('open')) {
-                chatWindow.style.display = 'flex';
-                chatWindow.style.zIndex = '999999';
-                console.log('✅ FORCED display:flex and z-index');
+                chatWindow.style.setProperty('display', 'flex', 'important');
+                chatWindow.style.setProperty('visibility', 'visible', 'important');
+                chatWindow.style.setProperty('opacity', '1', 'important');
+                chatWindow.style.setProperty('z-index', '999999', 'important');
+                chatWindow.style.setProperty('pointer-events', 'auto', 'important');
+                // Force position to ensure it's on screen
+                chatWindow.style.setProperty('position', 'fixed', 'important');
+                chatWindow.style.setProperty('bottom', '100px', 'important');
+                chatWindow.style.setProperty('right', '20px', 'important');
+                chatWindow.style.setProperty('width', '420px', 'important');
+                chatWindow.style.setProperty('height', '600px', 'important');
+                console.log('✅ FORCED all styles with !important');
+                console.log('📐 Size check - width:', chatWindow.offsetWidth, 'height:', chatWindow.offsetHeight);
                 var input = document.getElementById('rabbiInput');
                 if (input) input.focus();
             } else {
-                chatWindow.style.display = 'none';
+                chatWindow.style.setProperty('display', 'none', 'important');
             }
         };
         
