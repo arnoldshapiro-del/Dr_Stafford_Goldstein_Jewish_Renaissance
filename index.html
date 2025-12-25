@@ -1164,7 +1164,7 @@
             box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
         }
         
-        /* Yiddish Learning Panel */
+        /* Yiddish Learning Panel - Professional Interface */
         .yiddish-panel {
             position: absolute;
             top: 0;
@@ -1183,7 +1183,7 @@
         .yiddish-header {
             background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
             color: white;
-            padding: 15px;
+            padding: 12px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -1191,127 +1191,324 @@
         
         .yiddish-header h3 {
             margin: 0;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
         
-        .yiddish-progress {
+        .yiddish-header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        #yiddishLearnedCount {
+            font-size: 0.85rem;
+            background: rgba(255,215,0,0.2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: #FFD700;
+        }
+        
+        /* Search Bar */
+        .yiddish-search {
+            padding: 10px 12px;
+            background: white;
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+        }
+        
+        .yiddish-search input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid rgba(184, 134, 11, 0.3);
+            border-radius: 20px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .yiddish-search input:focus {
+            border-color: #B8860B;
+        }
+        
+        /* Category Tabs */
+        .yiddish-tabs {
+            display: flex;
+            gap: 6px;
+            padding: 10px 12px;
+            overflow-x: auto;
+            background: rgba(26, 54, 93, 0.05);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .yiddish-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .yiddish-tabs::-webkit-scrollbar-thumb {
+            background: rgba(184, 134, 11, 0.3);
+            border-radius: 2px;
+        }
+        
+        .yiddish-tab {
+            flex-shrink: 0;
+            padding: 6px 12px;
+            border: 1px solid rgba(184, 134, 11, 0.3);
+            background: white;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .yiddish-tab:hover {
+            background: rgba(184, 134, 11, 0.1);
+        }
+        
+        .yiddish-tab.active {
+            background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+            color: white;
+            border-color: #B8860B;
+        }
+        
+        /* Global Controls */
+        .yiddish-global-controls {
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px 15px;
-            background: rgba(184, 134, 11, 0.1);
-            border-bottom: 1px solid rgba(184, 134, 11, 0.3);
+            padding: 8px 12px;
+            background: rgba(26, 54, 93, 0.08);
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+            font-size: 0.8rem;
+            color: #1a365d;
         }
         
-        .yiddish-progress-bar {
-            flex: 1;
-            height: 8px;
-            background: rgba(184, 134, 11, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
+        .yiddish-global-controls input[type="range"] {
+            width: 80px;
+            height: 4px;
+            -webkit-appearance: none;
+            background: rgba(184, 134, 11, 0.3);
+            border-radius: 2px;
         }
         
-        .yiddish-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #B8860B, #FFD700);
-            border-radius: 4px;
-            transition: width 0.3s;
+        .yiddish-global-controls input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #B8860B;
+            cursor: pointer;
         }
         
-        .yiddish-content {
+        .yiddish-stop-all-btn {
+            margin-left: auto;
+            padding: 5px 12px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        
+        /* Word Grid - Compact Tappable Tiles */
+        .yiddish-word-grid {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            align-content: start;
         }
         
-        .yiddish-word-card {
+        .yiddish-word-tile {
             background: white;
-            border: 2px solid rgba(184, 134, 11, 0.3);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
+            border: 2px solid rgba(184, 134, 11, 0.2);
+            border-radius: 12px;
+            padding: 12px 10px;
             text-align: center;
-            transition: all 0.3s;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
         }
         
-        .yiddish-word-card:hover {
+        .yiddish-word-tile:hover {
             border-color: #B8860B;
-            box-shadow: 0 4px 20px rgba(184, 134, 11, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(184, 134, 11, 0.2);
         }
         
-        .yiddish-word {
-            font-size: 2rem;
+        .yiddish-word-tile:active {
+            transform: scale(0.98);
+        }
+        
+        .yiddish-word-tile.learned {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #28a745;
+        }
+        
+        .yiddish-word-tile.speaking {
+            border-color: #B8860B;
+            box-shadow: 0 0 0 3px rgba(184, 134, 11, 0.3);
+        }
+        
+        .yiddish-tile-word {
+            font-size: 1.3rem;
             font-weight: bold;
             color: #1a365d;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            direction: rtl;
         }
         
-        .yiddish-transliteration {
-            font-size: 1.2rem;
+        .yiddish-tile-translit {
+            font-size: 0.85rem;
             color: #B8860B;
-            font-style: italic;
-            margin-bottom: 10px;
+            font-weight: 500;
         }
         
-        .yiddish-meaning {
-            font-size: 1rem;
-            color: #555;
+        .yiddish-tile-speaker {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+        
+        .yiddish-tile-check {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            font-size: 0.8rem;
+            color: #28a745;
+        }
+        
+        /* Detail Overlay */
+        .yiddish-detail-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 30;
+            padding: 20px;
+        }
+        
+        .yiddish-detail-overlay.open {
+            display: flex;
+        }
+        
+        .yiddish-detail-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            max-width: 350px;
+            width: 100%;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .yiddish-detail-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .yiddish-detail-word {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #1a365d;
+            text-align: center;
+            margin-bottom: 5px;
+            direction: rtl;
+        }
+        
+        .yiddish-detail-translit {
+            font-size: 1.3rem;
+            color: #B8860B;
+            text-align: center;
+            font-style: italic;
             margin-bottom: 15px;
         }
         
-        .yiddish-example {
-            font-size: 0.9rem;
-            color: #777;
-            font-style: italic;
+        .yiddish-detail-meaning {
+            font-size: 1.1rem;
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
             padding: 10px;
-            background: rgba(184, 134, 11, 0.05);
+            background: rgba(184, 134, 11, 0.1);
             border-radius: 10px;
         }
         
-        .yiddish-speak-btn {
-            margin-top: 15px;
-            padding: 10px 25px;
+        .yiddish-detail-example {
+            font-size: 0.95rem;
+            color: #666;
+            text-align: center;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .yiddish-detail-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .yiddish-hear-btn {
+            padding: 12px 20px;
             background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
             color: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 25px;
             font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .yiddish-speak-btn:hover {
-            transform: scale(1.05);
+        .yiddish-hear-btn:hover {
+            transform: scale(1.02);
             box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
         }
         
-        .yiddish-nav {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            padding: 15px;
-            background: rgba(26, 54, 93, 0.05);
-            border-top: 1px solid rgba(184, 134, 11, 0.2);
+        .yiddish-hear-btn.speaking {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
         }
         
-        .yiddish-nav-btn {
+        .yiddish-learned-btn {
             padding: 10px 20px;
-            border: 2px solid #1a365d;
             background: white;
-            border-radius: 20px;
-            font-size: 0.9rem;
+            color: #28a745;
+            border: 2px solid #28a745;
+            border-radius: 25px;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
         }
         
-        .yiddish-nav-btn:hover {
-            background: #1a365d;
+        .yiddish-learned-btn:hover {
+            background: #28a745;
             color: white;
         }
         
-        .yiddish-nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
+        .yiddish-learned-btn.learned {
+            background: #28a745;
+            color: white;
         }
         
         /* Yiddish Audio Controls */
@@ -4310,25 +4507,61 @@
                 </div>
             </div>
             
-            <!-- Yiddish Learning Panel -->
+            <!-- Yiddish Learning Panel - Professional Language Learning Interface -->
             <div class="yiddish-panel" id="yiddishPanel">
                 <div class="yiddish-header">
-                    <h3>🗣️ Learn Yiddish with Rabbi Moshe</h3>
-                    <button onclick="window.closeYiddishPanel()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">✕</button>
-                </div>
-                <div class="yiddish-progress">
-                    <span id="yiddishWordNum">Word 1 of 200</span>
-                    <div class="yiddish-progress-bar">
-                        <div class="yiddish-progress-fill" id="yiddishProgressFill" style="width: 0.5%"></div>
+                    <h3>🗣️ Learn Yiddish</h3>
+                    <div class="yiddish-header-controls">
+                        <span id="yiddishLearnedCount">0/200 learned</span>
+                        <button onclick="window.closeYiddishPanel()" style="background:none;border:none;color:white;font-size:1.5rem;cursor:pointer;">✕</button>
                     </div>
                 </div>
-                <div class="yiddish-content" id="yiddishContent">
-                    <!-- Word cards will be inserted here -->
+                
+                <!-- Search Bar -->
+                <div class="yiddish-search">
+                    <input type="text" id="yiddishSearch" placeholder="🔍 Search words..." oninput="window.filterYiddishWords(this.value)">
                 </div>
-                <div class="yiddish-nav">
-                    <button class="yiddish-nav-btn" id="yiddishPrevBtn" onclick="window.prevYiddishWord()">← Previous</button>
-                    <button class="yiddish-nav-btn" onclick="window.randomYiddishWord()">🎲 Random</button>
-                    <button class="yiddish-nav-btn" id="yiddishNextBtn" onclick="window.nextYiddishWord()">Next →</button>
+                
+                <!-- Category Tabs -->
+                <div class="yiddish-tabs" id="yiddishTabs">
+                    <button class="yiddish-tab active" data-category="all" onclick="window.filterByCategory('all')">All (200)</button>
+                    <button class="yiddish-tab" data-category="greetings" onclick="window.filterByCategory('greetings')">👋 Greetings</button>
+                    <button class="yiddish-tab" data-category="food" onclick="window.filterByCategory('food')">🍲 Food</button>
+                    <button class="yiddish-tab" data-category="family" onclick="window.filterByCategory('family')">👨‍👩‍👧 Family</button>
+                    <button class="yiddish-tab" data-category="religious" onclick="window.filterByCategory('religious')">✡️ Religious</button>
+                    <button class="yiddish-tab" data-category="expressions" onclick="window.filterByCategory('expressions')">💬 Expressions</button>
+                    <button class="yiddish-tab" data-category="character" onclick="window.filterByCategory('character')">😊 Character</button>
+                    <button class="yiddish-tab" data-category="holidays" onclick="window.filterByCategory('holidays')">🕎 Holidays</button>
+                    <button class="yiddish-tab" data-category="wisdom" onclick="window.filterByCategory('wisdom')">📚 Wisdom</button>
+                    <button class="yiddish-tab" data-category="everyday" onclick="window.filterByCategory('everyday')">🏠 Everyday</button>
+                </div>
+                
+                <!-- Speed Control -->
+                <div class="yiddish-global-controls">
+                    <span>Speech Speed:</span>
+                    <input type="range" id="yiddishGlobalSpeed" min="0.5" max="1.5" step="0.1" value="0.9" oninput="window.setYiddishSpeed(this.value)">
+                    <span id="yiddishGlobalSpeedVal">0.9x</span>
+                    <button class="yiddish-stop-all-btn" onclick="window.stopAllYiddishSpeech()">⏹️ Stop</button>
+                </div>
+                
+                <!-- Word Grid -->
+                <div class="yiddish-word-grid" id="yiddishWordGrid">
+                    <!-- Words will be populated here -->
+                </div>
+                
+                <!-- Expanded Word Detail (hidden by default) -->
+                <div class="yiddish-detail-overlay" id="yiddishDetailOverlay" onclick="window.closeYiddishDetail(event)">
+                    <div class="yiddish-detail-card" id="yiddishDetailCard">
+                        <button class="yiddish-detail-close" onclick="window.closeYiddishDetail()">✕</button>
+                        <div class="yiddish-detail-word" id="detailWord"></div>
+                        <div class="yiddish-detail-translit" id="detailTranslit"></div>
+                        <div class="yiddish-detail-meaning" id="detailMeaning"></div>
+                        <div class="yiddish-detail-example" id="detailExample"></div>
+                        <div class="yiddish-detail-actions">
+                            <button class="yiddish-hear-btn" onclick="window.speakCurrentDetail()">🔊 Hear Rabbi Pronounce</button>
+                            <button class="yiddish-learned-btn" id="detailLearnedBtn" onclick="window.toggleLearned()">✓ Mark as Learned</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -6091,3 +6324,4 @@ Please provide a rich, meaningful teaching as you would deliver a Shabbat sermon
 
 </body>
 </html>
+
