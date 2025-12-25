@@ -68,7 +68,7 @@ exports.handler = async (event, context) => {
                         speechConfig: {
                             voiceConfig: {
                                 prebuiltVoiceConfig: {
-                                    voiceName: 'Kore' // Clear, warm voice
+                                    voiceName: 'Charon' // Deep, warm MALE voice
                                 }
                             }
                         }
