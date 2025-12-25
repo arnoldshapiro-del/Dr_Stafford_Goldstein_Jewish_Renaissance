@@ -1,69 +1,89 @@
-// Netlify Serverless Function - Pathway Recommender
-// Analyzes user responses and recommends best pathways
+// Pathway Recommendation Function
+// Uses Gemini 2.5 Flash for quiz-based pathway recommendations
 
 exports.handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+  // CORS headers for all responses
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Content-Type': 'application/json'
+  };
+
+  // Handle CORS preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
   }
 
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-  
-  if (!GEMINI_API_KEY) {
-    return { 
-      statusCode: 500, 
-      body: JSON.stringify({ error: 'API key not configured' })
-    };
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
   try {
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    
+    if (!GEMINI_API_KEY) {
+      console.error('GEMINI_API_KEY not set');
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'API key not configured' })
+      };
+    }
+
     const { answers } = JSON.parse(event.body);
     
-    const prompt = `You are Rabbi Moshe ben David, helping Dr. Stafford Goldstein (75-year-old retired gastroenterologist) find his ideal pathways for his Jewish Renaissance.
+    if (!answers || !Array.isArray(answers)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Quiz answers are required' })
+      };
+    }
 
-Based on his quiz answers, recommend his TOP 5 pathways from the 60 available:
+    const prompt = `Based on the following quiz answers from Dr. Stafford Goldstein, a 75-year-old retired gastroenterologist, recommend the top 5 pathways from the 60 sacred Jewish pathways for retirement fulfillment.
 
-**His Quiz Answers:**
-${JSON.stringify(answers, null, 2)}
+Quiz Answers:
+${answers.map((a, i) => `Q${i+1}: ${a.question} - Answer: ${a.answer}`).join('\n')}
 
-**Available Pathway Categories:**
-1. Torah Study (Retiree Kollel, Jewish Medical Ethics Teaching, Daf Yomi, Pirkei Avot Mastery)
-2. Chesed/Kindness (Free Clinic Director, Bikur Cholim, Israel Medical Missions, Jewish Senior Advocacy)
-3. Tikkun Olam (Environmental Stewardship, Healthcare Access Advocacy)
-4. Cultural Heritage (Jewish Genealogy, Yiddish/Hebrew Revival, Jewish Arts, Culinary Traditions)
-5. Innovation (AI Ethics, Nonprofit Tech Leadership, Medical Innovation Incubator, Ethics Board Leadership, Digital Education)
-6. Memory Preservation (Holocaust Oral History, Heritage Testimonies, Digital Archives, Family Tree Reconstruction, Historical Society Leadership)
-7. Mentorship (Physician Network Mentorship, Nonprofit Consulting, Senior Friendly Visiting, Kolel Leadership, Youth Health Education)
-8. Leadership (Gratz College Studies, Experiential Education, Board Service, Rabbinic Training, Cultural Fellowships)
+Available Pathway Categories:
+1. Torah Study: Kollel learning, Jewish medical ethics, Daf Yomi, Pirkei Avot mastery
+2. Chesed (Loving Kindness): Free clinic volunteering, Bikur Cholim, Israel medical missions, Jewish senior advocacy
+3. Tikkun Olam (Repairing World): Environmental stewardship, healthcare access advocacy
+4. Cultural Heritage: Jewish genealogy, Yiddish/Hebrew revival, Jewish arts, culinary traditions
+5. Innovation: AI ethics, nonprofit technology, medical innovation mentoring, ethics boards
+6. Memory Preservation: Holocaust oral history, heritage testimonies, digital archives, family tree reconstruction
+7. Mentorship: Jewish physicians network, nonprofit consulting, senior visiting, youth education
+8. Spiritual Leadership: Jewish studies, experiential education, board service, rabbinic training
 
-**Provide your response in this EXACT JSON format:**
+Analyze the answers and provide personalized pathway recommendations.
+
+Format as JSON:
 {
   "recommendations": [
     {
       "rank": 1,
-      "pathway": "Pathway Name",
-      "category": "Category Name",
+      "pathway": "Pathway name",
+      "category": "Category",
       "matchScore": 95,
-      "whyItFits": "2-3 sentences explaining why this is perfect for him based on his answers",
-      "firstStep": "One specific action to take this week",
-      "jewishConnection": "How this connects to Jewish values/texts"
+      "reason": "Why this pathway matches based on their answers",
+      "firstStep": "Concrete first action to take"
     }
   ],
-  "rabbiMessage": "A warm, personal message from the Rabbi about his journey ahead"
-}
+  "personalMessage": "A warm, encouraging message from Rabbi Moshe about their journey"
+}`;
 
-Return ONLY valid JSON, no other text.`;
-
-    // Use Gemini 3.0 Pro for best reasoning and personalized recommendations
+    // Call Gemini 2.5 Flash API
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 2048,
+            maxOutputTokens: 2048
           }
         })
       }
@@ -71,34 +91,44 @@ Return ONLY valid JSON, no other text.`;
 
     const data = await response.json();
     
-    if (data.error) {
-      throw new Error(data.error.message);
+    console.log('Gemini API response status:', response.status);
+    
+    if (!response.ok) {
+      console.error('Gemini API error:', JSON.stringify(data));
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ 
+          error: 'API error', 
+          details: data.error?.message || 'Unknown error'
+        })
+      };
     }
 
-    let content = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     
-    // Clean up JSON if wrapped in markdown
-    content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    // Clean up JSON response
+    responseText = responseText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     
-    const recommendations = JSON.parse(content);
+    let result;
+    try {
+      result = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      result = { raw: responseText };
+    }
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify(recommendations)
+      headers,
+      body: JSON.stringify(result)
     };
 
   } catch (error) {
-    console.error('Pathway Recommender Error:', error);
+    console.error('Function error:', error);
     return {
       statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
+      headers,
       body: JSON.stringify({ error: error.message })
     };
   }
