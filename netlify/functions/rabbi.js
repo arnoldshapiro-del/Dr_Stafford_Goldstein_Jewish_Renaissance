@@ -1,5 +1,5 @@
-// Rabbi Moshe Text-to-Speech Function
-// Uses Gemini 2.5 Flash TTS and converts L16 PCM to WAV
+// Rabbi Moshe ben David - AI Chat Function
+// Uses Gemini 2.0 Flash (stable model)
 
 exports.handler = async (event, context) => {
     // Handle CORS preflight
@@ -23,21 +23,23 @@ exports.handler = async (event, context) => {
         };
     }
 
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-    
-    if (!GEMINI_API_KEY) {
-        console.error('GEMINI_API_KEY not set');
-        return {
-            statusCode: 500,
-            headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ error: 'API key not configured', fallback: true })
-        };
-    }
-
     try {
-        const { text, language } = JSON.parse(event.body);
+        const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
         
-        if (!text || text.trim().length === 0) {
+        if (!GEMINI_API_KEY) {
+            console.error('GEMINI_API_KEY not set');
+            return {
+                statusCode: 500,
+                headers: { 'Access-Control-Allow-Origin': '*' },
+                body: JSON.stringify({ error: 'API key not configured' })
+            };
+        }
+
+        const body = JSON.parse(event.body || '{}');
+        const message = body.text || body.message || '';
+        const conversationHistory = body.conversationHistory || [];
+
+        if (!message) {
             return {
                 statusCode: 400,
                 headers: { 'Access-Control-Allow-Origin': '*' },
@@ -45,33 +47,56 @@ exports.handler = async (event, context) => {
             };
         }
 
-        // Limit text length
-        const truncatedText = text.substring(0, 800);
-        
-        // Style prompt for wise rabbi voice
-        const voicePrompt = language === 'he' 
-            ? `Speak warmly as an elderly rabbi: "${truncatedText}"`
-            : `Speak as a warm, wise elderly rabbi with gentle pace: "${truncatedText}"`;
+        console.log('Received message:', message);
 
-        // Try Gemini 2.5 Flash TTS
+        // Build conversation with Rabbi Moshe's personality
+        const systemPrompt = `You are Rabbi Moshe ben David, a warm and wise Orthodox rabbi who serves as a spiritual guide for Dr. Stafford Goldstein, a 75-year-old retired gastroenterologist seeking meaning in retirement through Jewish pathways.
+
+Your personality:
+- Warm, encouraging, and deeply knowledgeable about Jewish texts and traditions
+- You speak with gentle wisdom, occasionally using Hebrew/Yiddish phrases (with translations)
+- You understand the unique challenges of physician retirement and identity crisis
+- You guide toward sacred pathways: Torah study, chesed work, tikkun olam, cultural heritage, mentorship, and spiritual leadership
+- You reference relevant Jewish texts, stories of the sages, and practical wisdom
+- You are encouraging but realistic, validating struggles while pointing toward growth
+
+Give thoughtful, detailed responses of 3-4 paragraphs. Always end with an encouraging blessing or relevant Jewish teaching.`;
+
+        // Build messages array
+        const contents = [];
+        
+        // Add conversation history
+        for (const msg of conversationHistory) {
+            contents.push({
+                role: msg.role === 'assistant' ? 'model' : 'user',
+                parts: [{ text: msg.content }]
+            });
+        }
+        
+        // Add current message
+        contents.push({
+            role: 'user',
+            parts: [{ text: message }]
+        });
+
+        console.log('Calling Gemini API...');
+
+        // Call Gemini 2.0 Flash API (stable, fast)
         const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${GEMINI_API_KEY}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{ text: voicePrompt }]
-                    }],
+                    contents: contents,
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
                     generationConfig: {
-                        responseModalities: ['AUDIO'],
-                        speechConfig: {
-                            voiceConfig: {
-                                prebuiltVoiceConfig: {
-                                    voiceName: 'Charon' // Deep, warm MALE voice
-                                }
-                            }
-                        }
+                        temperature: 0.8,
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 1024
                     }
                 })
             }
@@ -79,105 +104,44 @@ exports.handler = async (event, context) => {
 
         const data = await response.json();
         
-        console.log('TTS API status:', response.status);
+        console.log('Gemini API response status:', response.status);
         
-        if (data.error) {
-            console.error('Gemini TTS error:', data.error.message);
+        if (!response.ok) {
+            console.error('Gemini API error:', JSON.stringify(data));
             return {
-                statusCode: 200,
+                statusCode: 500,
                 headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify({ error: data.error.message, fallback: true })
-            };
-        }
-
-        // Extract audio data
-        const audioData = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-        const mimeType = data.candidates?.[0]?.content?.parts?.[0]?.inlineData?.mimeType || '';
-        
-        if (!audioData) {
-            console.error('No audio data in response');
-            return {
-                statusCode: 200,
-                headers: { 'Access-Control-Allow-Origin': '*' },
-                body: JSON.stringify({ error: 'No audio generated', fallback: true })
-            };
-        }
-
-        console.log('Audio mimeType:', mimeType);
-        
-        // If it's L16 PCM format, convert to WAV
-        if (mimeType.includes('L16') || mimeType.includes('pcm')) {
-            // Decode base64 to binary
-            const pcmBuffer = Buffer.from(audioData, 'base64');
-            
-            // Create WAV header for 24kHz, 16-bit, mono PCM
-            const wavBuffer = addWavHeader(pcmBuffer, 24000, 16, 1);
-            
-            // Return as base64 WAV
-            return {
-                statusCode: 200,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
                 body: JSON.stringify({ 
-                    audio: wavBuffer.toString('base64'),
-                    mimeType: 'audio/wav'
+                    error: 'API error', 
+                    details: data.error?.message || 'Unknown error'
                 })
             };
         }
 
-        // Return as-is if already in a playable format
+        // Extract the response text
+        const responseText = data.candidates?.[0]?.content?.parts?.[0]?.text || 
+            'I apologize, but I could not generate a response. Please try again.';
+
+        console.log('Response generated successfully');
+
         return {
             statusCode: 200,
             headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ 
-                audio: audioData,
-                mimeType: mimeType || 'audio/wav'
+            body: JSON.stringify({
+                response: responseText,
+                model: 'gemini-2.0-flash'
             })
         };
 
     } catch (error) {
-        console.error('TTS Function error:', error);
+        console.error('Function error:', error);
         return {
-            statusCode: 200,
+            statusCode: 500,
             headers: { 'Access-Control-Allow-Origin': '*' },
-            body: JSON.stringify({ error: error.message, fallback: true })
+            body: JSON.stringify({ error: error.message })
         };
     }
 };
-
-// Function to add WAV header to raw PCM data
-function addWavHeader(pcmData, sampleRate, bitsPerSample, numChannels) {
-    const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
-    const blockAlign = numChannels * (bitsPerSample / 8);
-    const dataSize = pcmData.length;
-    const headerSize = 44;
-    const fileSize = headerSize + dataSize - 8;
-    
-    const header = Buffer.alloc(headerSize);
-    
-    // RIFF header
-    header.write('RIFF', 0);
-    header.writeUInt32LE(fileSize, 4);
-    header.write('WAVE', 8);
-    
-    // fmt chunk
-    header.write('fmt ', 12);
-    header.writeUInt32LE(16, 16); // fmt chunk size
-    header.writeUInt16LE(1, 20); // audio format (1 = PCM)
-    header.writeUInt16LE(numChannels, 22);
-    header.writeUInt32LE(sampleRate, 24);
-    header.writeUInt32LE(byteRate, 28);
-    header.writeUInt16LE(blockAlign, 32);
-    header.writeUInt16LE(bitsPerSample, 34);
-    
-    // data chunk
-    header.write('data', 36);
-    header.writeUInt32LE(dataSize, 40);
-    
-    return Buffer.concat([header, pcmData]);
-}
