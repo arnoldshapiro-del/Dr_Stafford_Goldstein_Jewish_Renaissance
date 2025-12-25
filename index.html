@@ -3751,15 +3751,7 @@
         let mediaRecorder = null;
         let speechRecognition = null;
 
-        // Define GLOBALLY on window object to ensure availability
-        window.toggleRabbiChat = function() {
-            console.log('🕎 toggleRabbiChat CALLED!');
-            const chatWindow = document.getElementById('rabbiChatWindow');
-            chatWindow.classList.toggle('open');
-            if (chatWindow.classList.contains('open')) {
-                document.getElementById('rabbiInput').focus();
-            }
-        }
+        // toggleRabbiChat is defined earlier in the file (line 3610) - DO NOT REDEFINE HERE
 
         function toggleRabbiFullscreen() {
             const chatWindow = document.getElementById('rabbiChatWindow');
