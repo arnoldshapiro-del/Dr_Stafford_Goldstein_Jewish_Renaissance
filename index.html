@@ -1008,6 +1008,124 @@
             transform: scale(1.05);
         }
         
+        /* ═══════════════════════════════════════════════════════════════
+           🎵 AUDIO PLAYER CONTROLS
+           ═══════════════════════════════════════════════════════════════ */
+        
+        .rabbi-audio-player {
+            background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
+            border-radius: 15px;
+            padding: 12px 15px;
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .rabbi-player-controls {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .rabbi-player-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .rabbi-player-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+        }
+        
+        .rabbi-stop-speech-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .rabbi-stop-speech-btn:hover {
+            background: linear-gradient(135deg, #c82333 0%, #a71d2a 100%);
+        }
+        
+        .rabbi-player-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .rabbi-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .rabbi-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #B8860B, #FFD700);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .rabbi-player-speed {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-size: 0.8rem;
+        }
+        
+        .rabbi-player-speed input[type="range"] {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .rabbi-player-speed input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #B8860B 0%, #FFD700 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        .rabbi-player-speed input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #B8860B 0%, #FFD700 100%);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        #speedValue {
+            min-width: 35px;
+            text-align: right;
+            font-weight: bold;
+            color: #FFD700;
+        }
+        
         /* Message Action Buttons */
         .rabbi-message-actions {
             display: flex;
@@ -3868,12 +3986,6 @@
                     <button class="rabbi-mode-btn active" id="modeDetailed" onclick="window.setResponseMode('detailed')" title="Thoughtful 3-4 paragraph answer">📝 Detailed</button>
                     <button class="rabbi-mode-btn" id="modeDeep" onclick="window.setResponseMode('deep')" title="Comprehensive scholarly teaching">📚 Deep Scholar</button>
                 </div>
-                <div class="rabbi-speed-toggle" style="margin-left: auto;">
-                    <span style="font-size: 0.7rem; color: #666;">Speech:</span>
-                    <button class="rabbi-speed-btn" onclick="window.setSpeechSpeed(0.7)" title="Slow speech">🐢</button>
-                    <button class="rabbi-speed-btn active" onclick="window.setSpeechSpeed(1.0)" title="Normal speed">1x</button>
-                    <button class="rabbi-speed-btn" onclick="window.setSpeechSpeed(1.4)" title="Fast speech">🐇</button>
-                </div>
             </div>
             
             <!-- Suggested Prompts -->
@@ -4345,12 +4457,160 @@
         // ═══════════════════════════════════════════════════════════════
         // 🔊 TEXT-TO-SPEECH (Rabbi Voice)
         // ═══════════════════════════════════════════════════════════════
+        // ═══════════════════════════════════════════════════════════════
+        // 🔊 ADVANCED SPEECH SYSTEM WITH FULL CONTROLS
+        // ═══════════════════════════════════════════════════════════════
+        
+        // Speech state
+        window.rabbiSpeechState = {
+            isPlaying: false,
+            isPaused: false,
+            chunks: [],
+            currentChunkIndex: 0,
+            utterance: null,
+            rate: 1.0
+        };
+        
+        // Split text into chunks to prevent cutoff (browser TTS has ~60 second limit)
+        function splitTextIntoChunks(text, maxLength) {
+            maxLength = maxLength || 150; // shorter chunks for reliability
+            var chunks = [];
+            var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+            var currentChunk = '';
+            
+            for (var i = 0; i < sentences.length; i++) {
+                var sentence = sentences[i].trim();
+                if ((currentChunk + ' ' + sentence).length > maxLength && currentChunk.length > 0) {
+                    chunks.push(currentChunk.trim());
+                    currentChunk = sentence;
+                } else {
+                    currentChunk = currentChunk ? currentChunk + ' ' + sentence : sentence;
+                }
+            }
+            if (currentChunk.trim()) {
+                chunks.push(currentChunk.trim());
+            }
+            return chunks.length > 0 ? chunks : [text];
+        }
+        
+        // Show audio player UI
+        function showAudioPlayer(messageElement) {
+            // Remove any existing player
+            hideAudioPlayer();
+            
+            var state = window.rabbiSpeechState;
+            var playerHtml = '<div id="rabbiAudioPlayer" class="rabbi-audio-player">' +
+                '<div class="rabbi-player-controls">' +
+                    '<button class="rabbi-player-btn" onclick="window.skipBackward()" title="Previous">⏮️</button>' +
+                    '<button class="rabbi-player-btn" id="playPauseBtn" onclick="window.togglePlayPause()" title="Play/Pause">⏸️</button>' +
+                    '<button class="rabbi-player-btn" onclick="window.skipForward()" title="Next">⏭️</button>' +
+                    '<button class="rabbi-player-btn rabbi-stop-speech-btn" onclick="window.stopSpeech()" title="Stop">⏹️</button>' +
+                '</div>' +
+                '<div class="rabbi-player-progress">' +
+                    '<span id="chunkProgress">1 / 1</span>' +
+                    '<div class="rabbi-progress-bar"><div class="rabbi-progress-fill" id="progressFill"></div></div>' +
+                '</div>' +
+                '<div class="rabbi-player-speed">' +
+                    '<span>Speed:</span>' +
+                    '<input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="' + state.rate + '" oninput="window.changeSpeed(this.value)">' +
+                    '<span id="speedValue">' + state.rate.toFixed(1) + 'x</span>' +
+                '</div>' +
+            '</div>';
+            
+            messageElement.insertAdjacentHTML('beforeend', playerHtml);
+        }
+        
+        function hideAudioPlayer() {
+            var player = document.getElementById('rabbiAudioPlayer');
+            if (player) player.remove();
+        }
+        
+        function updateProgress() {
+            var state = window.rabbiSpeechState;
+            var progressEl = document.getElementById('chunkProgress');
+            var fillEl = document.getElementById('progressFill');
+            if (progressEl && state.chunks.length > 0) {
+                progressEl.textContent = (state.currentChunkIndex + 1) + ' / ' + state.chunks.length;
+            }
+            if (fillEl && state.chunks.length > 0) {
+                var percent = ((state.currentChunkIndex + 1) / state.chunks.length) * 100;
+                fillEl.style.width = percent + '%';
+            }
+        }
+        
+        // Speak current chunk
+        function speakCurrentChunk() {
+            var state = window.rabbiSpeechState;
+            
+            if (state.currentChunkIndex >= state.chunks.length) {
+                // Finished all chunks
+                window.stopSpeech();
+                return;
+            }
+            
+            if (!('speechSynthesis' in window)) {
+                alert('Text-to-speech not supported in your browser');
+                return;
+            }
+            
+            speechSynthesis.cancel();
+            
+            var chunk = state.chunks[state.currentChunkIndex];
+            var utterance = new SpeechSynthesisUtterance(chunk);
+            utterance.lang = window.currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
+            utterance.rate = state.rate;
+            utterance.pitch = 0.95;
+            
+            // Find a good voice
+            var voices = speechSynthesis.getVoices();
+            var preferredVoice = voices.find(function(v) {
+                return v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'));
+            }) || voices.find(function(v) { return v.lang.startsWith('en'); });
+            if (preferredVoice) utterance.voice = preferredVoice;
+            
+            utterance.onend = function() {
+                if (state.isPlaying && !state.isPaused) {
+                    state.currentChunkIndex++;
+                    updateProgress();
+                    speakCurrentChunk(); // Speak next chunk
+                }
+            };
+            
+            utterance.onerror = function(e) {
+                console.log('Speech error:', e);
+                if (state.isPlaying) {
+                    state.currentChunkIndex++;
+                    updateProgress();
+                    speakCurrentChunk();
+                }
+            };
+            
+            state.utterance = utterance;
+            speechSynthesis.speak(utterance);
+            updateProgress();
+            
+            var playBtn = document.getElementById('playPauseBtn');
+            if (playBtn) playBtn.textContent = '⏸️';
+        }
+        
+        // Main speak function
         async function speakMessage(messageElement) {
-            // Get text from all paragraphs in the message
-            const paragraphs = messageElement.querySelectorAll('p');
-            let text = '';
-            for (let p of paragraphs) {
-                text += p.textContent + ' ';
+            var state = window.rabbiSpeechState;
+            
+            // If already playing this message, toggle pause
+            if (state.isPlaying && state.messageElement === messageElement) {
+                window.togglePlayPause();
+                return;
+            }
+            
+            // Stop any current speech
+            window.stopSpeech();
+            
+            // Get text from message
+            var paragraphs = messageElement.querySelectorAll('p');
+            var text = '';
+            for (var i = 0; i < paragraphs.length; i++) {
+                text += paragraphs[i].textContent + ' ';
             }
             text = text.trim();
             
@@ -4359,116 +4619,94 @@
                 return;
             }
             
-            const speakerBtn = messageElement.querySelector('.speaker-btn');
-            if (!speakerBtn) return;
+            // Initialize state
+            state.chunks = splitTextIntoChunks(text, 150);
+            state.currentChunkIndex = 0;
+            state.isPlaying = true;
+            state.isPaused = false;
+            state.messageElement = messageElement;
             
-            speakerBtn.innerHTML = '⏳';
-            speakerBtn.disabled = true;
-
-            try {
-                // Try Gemini TTS first
-                const response = await fetch('/.netlify/functions/tts', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        text: text.substring(0, 800), // Limit text length
-                        language: currentLanguageMode
-                    })
-                });
-
-                const data = await response.json();
-                
-                // Check if we should use fallback
-                if (data.fallback || data.error || !data.audio) {
-                    console.log('TTS returned fallback signal, using browser TTS');
-                    useBrowserTTS(text, speakerBtn);
-                    return;
-                }
-                
-                // Play audio from base64
-                try {
-                    const audioData = atob(data.audio);
-                    const audioArray = new Uint8Array(audioData.length);
-                    for (let i = 0; i < audioData.length; i++) {
-                        audioArray[i] = audioData.charCodeAt(i);
-                    }
-                    const mimeType = data.mimeType || 'audio/wav';
-                    console.log('Playing audio with mimeType:', mimeType);
-                    
-                    const audioBlob = new Blob([audioArray], { type: mimeType });
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const audio = new Audio(audioUrl);
-                    
-                    audio.onended = () => {
-                        speakerBtn.innerHTML = '🔊';
-                        speakerBtn.disabled = false;
-                        URL.revokeObjectURL(audioUrl);
-                    };
-                    
-                    audio.onerror = (e) => {
-                        console.log('Audio playback error:', e);
-                        URL.revokeObjectURL(audioUrl);
-                        useBrowserTTS(text, speakerBtn);
-                    };
-                    
-                    await audio.play();
-                } catch (playError) {
-                    console.log('Audio processing failed:', playError);
-                    useBrowserTTS(text, speakerBtn);
-                }
-            } catch (error) {
-                console.log('TTS fetch error:', error);
-                useBrowserTTS(text, speakerBtn);
-            }
+            console.log('Speaking ' + state.chunks.length + ' chunks');
+            
+            // Show player UI
+            showAudioPlayer(messageElement);
+            
+            // Update button in message
+            var speakerBtn = messageElement.querySelector('.speaker-btn');
+            if (speakerBtn) speakerBtn.textContent = '🔊 Playing...';
+            
+            // Start speaking
+            speakCurrentChunk();
         }
         
-        function useBrowserTTS(text, speakerBtn) {
-            if ('speechSynthesis' in window) {
-                speechSynthesis.cancel();
-                
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = currentLanguageMode === 'he' ? 'he-IL' : 'en-US';
-                utterance.rate = 0.85;
-                utterance.pitch = 0.9;
-                
-                // Try to find a good voice
-                const voices = speechSynthesis.getVoices();
-                if (voices.length === 0) {
-                    // Voices not loaded yet, wait and try again
-                    speechSynthesis.onvoiceschanged = () => {
-                        const newVoices = speechSynthesis.getVoices();
-                        const preferredVoice = newVoices.find(v => 
-                            v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'))
-                        ) || newVoices.find(v => v.lang.startsWith('en'));
-                        if (preferredVoice) utterance.voice = preferredVoice;
-                    };
-                } else {
-                    const preferredVoice = voices.find(v => 
-                        v.lang.startsWith('en') && (v.name.includes('Male') || v.name.includes('David') || v.name.includes('Daniel'))
-                    ) || voices.find(v => v.lang.startsWith('en'));
-                    if (preferredVoice) utterance.voice = preferredVoice;
-                }
-                
-                utterance.onend = () => {
-                    speakerBtn.innerHTML = '🔊';
-                    speakerBtn.disabled = false;
-                };
-                
-                utterance.onerror = () => {
-                    speakerBtn.innerHTML = '🔊';
-                    speakerBtn.disabled = false;
-                };
-                
-                speechSynthesis.speak(utterance);
+        // Control functions
+        window.togglePlayPause = function() {
+            var state = window.rabbiSpeechState;
+            var playBtn = document.getElementById('playPauseBtn');
+            
+            if (state.isPaused) {
+                // Resume
+                state.isPaused = false;
+                speechSynthesis.resume();
+                if (playBtn) playBtn.textContent = '⏸️';
             } else {
-                speakerBtn.innerHTML = '🔊';
-                speakerBtn.disabled = false;
-                alert('Text-to-speech is not supported in your browser.');
+                // Pause
+                state.isPaused = true;
+                speechSynthesis.pause();
+                if (playBtn) playBtn.textContent = '▶️';
             }
-        }
+        };
+        
+        window.stopSpeech = function() {
+            var state = window.rabbiSpeechState;
+            speechSynthesis.cancel();
+            state.isPlaying = false;
+            state.isPaused = false;
+            state.chunks = [];
+            state.currentChunkIndex = 0;
+            
+            // Reset button
+            if (state.messageElement) {
+                var speakerBtn = state.messageElement.querySelector('.speaker-btn');
+                if (speakerBtn) speakerBtn.textContent = '🔊 Listen';
+            }
+            
+            hideAudioPlayer();
+        };
+        
+        window.skipForward = function() {
+            var state = window.rabbiSpeechState;
+            if (state.currentChunkIndex < state.chunks.length - 1) {
+                speechSynthesis.cancel();
+                state.currentChunkIndex++;
+                speakCurrentChunk();
+            }
+        };
+        
+        window.skipBackward = function() {
+            var state = window.rabbiSpeechState;
+            if (state.currentChunkIndex > 0) {
+                speechSynthesis.cancel();
+                state.currentChunkIndex--;
+                speakCurrentChunk();
+            }
+        };
+        
+        window.changeSpeed = function(value) {
+            var state = window.rabbiSpeechState;
+            state.rate = parseFloat(value);
+            var speedEl = document.getElementById('speedValue');
+            if (speedEl) speedEl.textContent = state.rate.toFixed(1) + 'x';
+            
+            // If currently playing, restart current chunk with new speed
+            if (state.isPlaying && !state.isPaused) {
+                speechSynthesis.cancel();
+                speakCurrentChunk();
+            }
+        };
+        
         window.speakMessage = speakMessage;
-        window.useBrowserTTS = useBrowserTTS;
-        console.log('✅ speakMessage is now:', typeof window.speakMessage);
+        console.log('✅ Advanced speech system initialized');
 
         // ═══════════════════════════════════════════════════════════════
         // 🔲 FULLSCREEN TOGGLE
