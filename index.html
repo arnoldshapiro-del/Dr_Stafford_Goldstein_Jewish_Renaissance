@@ -3545,6 +3545,10 @@
                 ? 'שאל את הרב כל שאלה...' 
                 : 'Ask the Rabbi anything about Judaism...';
             input.dir = mode === 'he' ? 'rtl' : 'ltr';
+            
+            // Show visual feedback
+            const langName = mode === 'he' ? 'עברית (Hebrew)' : 'English';
+            addMessageToChat('rabbi', `🌐 Language mode switched to: ${langName}\n\nI will now respond primarily in ${mode === 'he' ? 'Hebrew' : 'English'}.`);
         }
 
         function handleRabbiInputKeypress(event) {
@@ -3761,14 +3765,39 @@
         // ═══════════════════════════════════════════════════════════════
         async function translateLastMessage() {
             const messages = document.querySelectorAll('.rabbi-message');
-            if (messages.length === 0) return;
+            if (messages.length === 0) {
+                addMessageToChat('rabbi', '📜 No messages to translate yet. Ask me something first!');
+                return;
+            }
 
             const lastMessage = messages[messages.length - 1];
-            const text = lastMessage.querySelector('p').textContent;
+            const paragraphs = lastMessage.querySelectorAll('p');
+            if (paragraphs.length === 0) {
+                addMessageToChat('rabbi', '📜 No text found to translate.');
+                return;
+            }
             
-            // Detect language direction
+            // Get text from first paragraph (skip any translation markers)
+            let text = '';
+            for (let p of paragraphs) {
+                const pText = p.textContent.trim();
+                if (!pText.startsWith('📜')) {
+                    text = pText;
+                    break;
+                }
+            }
+            
+            if (!text) {
+                addMessageToChat('rabbi', '📜 No translatable text found.');
+                return;
+            }
+            
+            // Show translating indicator
+            addMessageToChat('rabbi', '📜 Translating...');
+            
+            // Detect language direction - if Hebrew characters present, translate to English
             const isHebrew = /[\u0590-\u05FF]/.test(text);
-            const direction = isHebrew ? 'he-to-en' : 'en-to-he';
+            const direction = isHebrew ? 'toEnglish' : 'toHebrew';
 
             try {
                 const response = await fetch('/.netlify/functions/translate', {
@@ -3779,12 +3808,40 @@
 
                 const data = await response.json();
                 
-                if (data.translation) {
-                    addMessageToChat('rabbi', `📜 Translation:\n${data.translation}`);
+                // Remove the "Translating..." message
+                const allMessages = document.querySelectorAll('.rabbi-message');
+                const lastMsg = allMessages[allMessages.length - 1];
+                if (lastMsg && lastMsg.textContent.includes('Translating...')) {
+                    lastMsg.remove();
+                }
+                
+                // Handle different response formats
+                if (data.result) {
+                    if (direction === 'toHebrew') {
+                        const hebrew = data.result.hebrew || data.result.transliteration || '';
+                        const transliteration = data.result.transliteration || '';
+                        addMessageToChat('rabbi', `📜 Translation to Hebrew:\n\n${hebrew}${transliteration ? '\n\nPronunciation: ' + transliteration : ''}`);
+                    } else {
+                        const english = data.result.english || data.result.translation || JSON.stringify(data.result);
+                        addMessageToChat('rabbi', `📜 Translation to English:\n\n${english}`);
+                    }
+                } else if (data.translation) {
+                    addMessageToChat('rabbi', `📜 Translation:\n\n${data.translation}`);
+                } else if (data.error) {
+                    addMessageToChat('rabbi', `📜 Translation error: ${data.error}`);
+                } else {
+                    addMessageToChat('rabbi', '📜 I received a response but could not parse the translation. Please try again.');
+                    console.log('Unexpected translate response:', data);
                 }
             } catch (error) {
                 console.error('Translation error:', error);
-                addMessageToChat('rabbi', 'I apologize, but I could not translate that at the moment.');
+                // Remove the "Translating..." message
+                const allMessages = document.querySelectorAll('.rabbi-message');
+                const lastMsg = allMessages[allMessages.length - 1];
+                if (lastMsg && lastMsg.textContent.includes('Translating...')) {
+                    lastMsg.remove();
+                }
+                addMessageToChat('rabbi', '📜 I apologize, but I could not translate that at the moment. Please try again.');
             }
         }
 
