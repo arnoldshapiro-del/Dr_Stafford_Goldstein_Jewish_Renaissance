@@ -1,6 +1,5 @@
 // Rabbi Moshe ben David - AI Chat Function
 // Uses Gemini 2.0 Flash (stable model)
-// Supports response modes: quick, detailed, deep
 
 exports.handler = async (event, context) => {
     // Handle CORS preflight
@@ -52,32 +51,12 @@ exports.handler = async (event, context) => {
         console.log('Received message:', message);
         console.log('Response mode:', responseMode);
 
-        // Configure response based on mode
-        let responseInstructions;
-        let maxTokens;
-        
-        switch (responseMode) {
-            case 'quick':
-                responseInstructions = `Give a BRIEF response of 1-2 short paragraphs. Be warm but concise. Get straight to the key point with one relevant teaching or insight. End with a short blessing or encouragement.`;
-                maxTokens = 512;
-                break;
-            case 'deep':
-                responseInstructions = `Give a COMPREHENSIVE scholarly teaching of 5-8 paragraphs (like a mini-lecture or sermon). Include:
-- Multiple perspectives from different commentators (Rashi, Ramban, Sforno, Chassidic masters)
-- Relevant stories from the Talmud or Midrash
-- Deep spiritual insights and mystical connections
-- Practical applications for daily life
-- Multiple Hebrew/Yiddish terms with translations
-- Historical context where relevant
-- References to specific texts (cite chapter/verse when possible)
-- End with an extended blessing and call to action
-
-This should feel like sitting with a learned rabbi for an in-depth study session.`;
-                maxTokens = 4096;
-                break;
-            default: // detailed
-                responseInstructions = `Give a thoughtful, warm response of 3-4 paragraphs. Include relevant Jewish texts, a story or teaching from the sages, and practical wisdom. Use occasional Hebrew/Yiddish phrases with translations. End with an encouraging blessing.`;
-                maxTokens = 1536;
+        // Set maxOutputTokens based on response mode
+        let maxTokens = 2048; // default for detailed
+        if (responseMode === 'quick') {
+            maxTokens = 1500;
+        } else if (responseMode === 'deep') {
+            maxTokens = 8192; // maximum for deep scholarly responses
         }
 
         // Build conversation with Rabbi Moshe's personality
@@ -86,13 +65,13 @@ This should feel like sitting with a learned rabbi for an in-depth study session
 Your personality:
 - Warm, encouraging, and deeply knowledgeable about Jewish texts and traditions
 - You speak with gentle wisdom, occasionally using Hebrew/Yiddish phrases (with translations)
-- You understand the unique challenges of physician retirement and identity transition
+- You understand the unique challenges of physician retirement and identity crisis
 - You guide toward sacred pathways: Torah study, chesed work, tikkun olam, cultural heritage, mentorship, and spiritual leadership
 - You reference relevant Jewish texts, stories of the sages, and practical wisdom
 - You are encouraging but realistic, validating struggles while pointing toward growth
-- When citing sources, be specific (e.g., "As we learn in Pirkei Avot 1:14..." or "Rashi comments on this verse...")
+- You cite sources when appropriate (Talmud, Midrash, Rashi, Rambam, etc.)
 
-${responseInstructions}`;
+IMPORTANT: Follow the length instructions in the user's message carefully. If they ask for a comprehensive or deep response, provide extensive detail with many paragraphs, sources, and examples. Always end with an encouraging blessing or relevant Jewish teaching.`;
 
         // Build messages array
         const contents = [];
@@ -125,7 +104,7 @@ ${responseInstructions}`;
                         parts: [{ text: systemPrompt }]
                     },
                     generationConfig: {
-                        temperature: responseMode === 'deep' ? 0.85 : 0.8,
+                        temperature: 0.8,
                         topK: 40,
                         topP: 0.95,
                         maxOutputTokens: maxTokens
@@ -165,7 +144,8 @@ ${responseInstructions}`;
             body: JSON.stringify({
                 response: responseText,
                 model: 'gemini-2.0-flash',
-                mode: responseMode
+                mode: responseMode,
+                tokensUsed: maxTokens
             })
         };
 
