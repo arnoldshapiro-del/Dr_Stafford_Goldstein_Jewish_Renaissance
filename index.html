@@ -1161,53 +1161,34 @@
            📚 TEACHING COURSES
            ═══════════════════════════════════════════════════════════════ */
         
-        .rabbi-courses {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            padding: 6px 10px;
+        /* Course Buttons Grid */
+        .rabbi-course-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 10px;
             background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
             border-bottom: 2px solid rgba(184, 134, 11, 0.5);
-            overflow-x: auto;
-            flex-wrap: wrap;
-            -webkit-overflow-scrolling: touch;
-            max-height: 80px;
-        }
-        
-        .rabbi-courses::-webkit-scrollbar {
-            height: 4px;
-        }
-        
-        .rabbi-courses::-webkit-scrollbar-thumb {
-            background: rgba(255, 215, 0, 0.5);
-            border-radius: 2px;
-        }
-        
-        .rabbi-courses-label {
-            font-size: 0.7rem;
-            color: #FFD700;
-            font-weight: bold;
-            flex-shrink: 0;
         }
         
         .rabbi-course-btn {
-            padding: 4px 8px;
-            border: 1px solid #FFD700;
-            background: linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(218, 165, 32, 0.3) 100%);
-            border-radius: 12px;
-            font-size: 0.65rem;
+            padding: 8px 6px;
+            border: 2px solid #FFD700;
+            background: linear-gradient(135deg, rgba(184, 134, 11, 0.3) 0%, rgba(218, 165, 32, 0.4) 100%);
+            border-radius: 10px;
+            font-size: 0.7rem;
             cursor: pointer;
             transition: all 0.3s;
             color: white;
-            font-weight: 500;
-            flex-shrink: 0;
+            font-weight: 600;
+            text-align: center;
             white-space: nowrap;
         }
         
         .rabbi-course-btn:hover {
             background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(184, 134, 11, 0.5);
         }
         
         /* Yiddish Learning Panel - Professional Interface */
@@ -4521,29 +4502,21 @@
                 </div>
             </div>
             
-            <!-- Teaching Courses -->
-            <div class="rabbi-courses">
-                <span class="rabbi-courses-label">📚 Courses:</span>
-                <button class="rabbi-course-btn" onclick="window.openCourse('parsha')" title="Weekly Torah Portion">📜 Parsha</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('talmud')" title="Talmudic Wisdom">📖 Talmud</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('mishnah')" title="Mishnah Study">📕 Mishnah</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('mishnahTorah')" title="Rambam's Mishneh Torah">📗 Mishneh Torah</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('chesed')" title="Laws of Loving Kindness">💝 Chesed</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('mussar')" title="Jewish Ethics & Character">🌟 Mussar</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('halacha')" title="Jewish Law">⚖️ Halacha</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('chassidus')" title="Chassidic Philosophy">✨ Chassidus</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('kabbalah')" title="Jewish Mysticism">🔮 Kabbalah</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('tehillim')" title="Psalms Study">🎵 Tehillim</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('pirkeiAvot')" title="Ethics of the Fathers">👴 Pirkei Avot</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('yiddish')" title="Learn 200 Yiddish Words">🗣️ Yiddish</button>
-            </div>
             
-            <!-- Suggested Prompts -->
-            <div class="rabbi-suggestions" id="rabbiSuggestions">
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What does the Torah teach about finding purpose in retirement?')">🎯 Purpose</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('How can I start studying Torah as a beginner?')">📚 Beginner</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What chesed projects are meaningful for someone my age?')">❤️ Chesed Ideas</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('Tell me a story of wisdom from the Talmud')">📖 Story</button>
+            <!-- Course Buttons Grid -->
+            <div class="rabbi-course-grid">
+                <button class="rabbi-course-btn" onclick="window.openCourse('parsha')">📜 Parsha</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('talmud')">📖 Talmud</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('mishnah')">📕 Mishnah</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('mishnahTorah')">📗 Mishneh Torah</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('chesed')">💝 Chesed</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('mussar')">🌟 Mussar</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('halacha')">⚖️ Halacha</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('chassidus')">✨ Chassidus</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('kabbalah')">🔮 Kabbalah</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('tehillim')">🎵 Tehillim</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('pirkeiAvot')">👴 Pirkei Avot</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('yiddish')">🗣️ Yiddish</button>
             </div>
             
             <div class="rabbi-messages font-medium" id="rabbiMessages">
