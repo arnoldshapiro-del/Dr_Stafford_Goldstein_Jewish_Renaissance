@@ -1126,36 +1126,81 @@
             color: #FFD700;
         }
         
+        .rabbi-voice-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: white;
+            font-size: 0.8rem;
+            padding-top: 5px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .voice-toggle-btn {
+            padding: 6px 12px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .voice-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .voice-toggle-btn.active {
+            background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+            border-color: #FFD700;
+            font-weight: bold;
+        }
+
         /* ═══════════════════════════════════════════════════════════════
            📚 TEACHING COURSES
            ═══════════════════════════════════════════════════════════════ */
         
         .rabbi-courses {
             display: flex;
-            flex-wrap: wrap;
             align-items: center;
             gap: 6px;
             padding: 8px 12px;
             background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
             border-bottom: 2px solid rgba(184, 134, 11, 0.5);
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .rabbi-courses::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .rabbi-courses::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 2px;
         }
         
         .rabbi-courses-label {
             font-size: 0.75rem;
             color: #FFD700;
             font-weight: bold;
+            flex-shrink: 0;
         }
         
         .rabbi-course-btn {
-            padding: 6px 12px;
+            padding: 6px 10px;
             border: 2px solid #FFD700;
             background: linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(218, 165, 32, 0.3) 100%);
             border-radius: 15px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             cursor: pointer;
             transition: all 0.3s;
             color: white;
             font-weight: 500;
+            flex-shrink: 0;
+            white-space: nowrap;
         }
         
         .rabbi-course-btn:hover {
@@ -1309,6 +1354,26 @@
             border-radius: 12px;
             font-size: 0.75rem;
             cursor: pointer;
+        }
+        
+        .yiddish-voice-btn {
+            padding: 4px 10px;
+            border: 1px solid rgba(184, 134, 11, 0.5);
+            background: white;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .yiddish-voice-btn:hover {
+            background: rgba(184, 134, 11, 0.1);
+        }
+        
+        .yiddish-voice-btn.active {
+            background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
+            color: white;
+            border-color: #B8860B;
         }
         
         /* Word List - Simple Scrollable */
@@ -4458,9 +4523,18 @@
             <!-- Teaching Courses -->
             <div class="rabbi-courses">
                 <span class="rabbi-courses-label">📚 Courses:</span>
-                <button class="rabbi-course-btn" onclick="window.openCourse('parsha')" title="Weekly Torah Portion">📜 Parsha Study</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('talmud')" title="Talmudic Wisdom">📖 Talmud Insights</button>
-                <button class="rabbi-course-btn" onclick="window.openCourse('yiddish')" title="Learn 200 Yiddish Words">🗣️ Learn Yiddish</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('parsha')" title="Weekly Torah Portion">📜 Parsha</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('talmud')" title="Talmudic Wisdom">📖 Talmud</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('mishnah')" title="Mishnah Study">📕 Mishnah</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('mishnahTorah')" title="Rambam's Mishneh Torah">📗 Mishneh Torah</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('chesed')" title="Laws of Loving Kindness">💝 Chesed</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('mussar')" title="Jewish Ethics & Character">🌟 Mussar</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('halacha')" title="Jewish Law">⚖️ Halacha</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('chassidus')" title="Chassidic Philosophy">✨ Chassidus</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('kabbalah')" title="Jewish Mysticism">🔮 Kabbalah</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('tehillim')" title="Psalms Study">🎵 Tehillim</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('pirkeiAvot')" title="Ethics of the Fathers">👴 Pirkei Avot</button>
+                <button class="rabbi-course-btn" onclick="window.openCourse('yiddish')" title="Learn 200 Yiddish Words">🗣️ Yiddish</button>
             </div>
             
             <!-- Suggested Prompts -->
@@ -4516,11 +4590,14 @@
                     <input type="text" id="yiddishSearch" placeholder="🔍 Search words..." oninput="window.filterYiddishWords(this.value)">
                 </div>
                 
-                <!-- Speed Control -->
+                <!-- Speed and Voice Controls -->
                 <div class="yiddish-global-controls">
-                    <span>Speech Speed:</span>
+                    <span>Speed:</span>
                     <input type="range" id="yiddishGlobalSpeed" min="0.5" max="1.5" step="0.1" value="0.9" oninput="window.setYiddishSpeed(this.value)">
                     <span id="yiddishGlobalSpeedVal">0.9x</span>
+                    <span style="margin-left:10px;">Voice:</span>
+                    <button class="yiddish-voice-btn" id="yiddishVoiceHuman" onclick="window.setVoiceMode('human')">🎭 Human</button>
+                    <button class="yiddish-voice-btn" id="yiddishVoiceFast" onclick="window.setVoiceMode('fast')">⚡ Fast</button>
                     <button class="yiddish-stop-all-btn" onclick="window.stopAllYiddishSpeech()">⏹️ Stop</button>
                 </div>
                 
@@ -4889,7 +4966,25 @@
             } else if (course === 'parsha') {
                 window.loadTorahPortion();
             } else if (course === 'talmud') {
-                window.askRabbi('Please teach me a profound story or insight from the Talmud, with the original source, its meaning, and how I can apply it in my life.');
+                window.askRabbi('Please teach me a profound teaching from the Talmud. Include: (1) The original source (tractate and page), (2) The Hebrew/Aramaic text if relevant, (3) A clear explanation of the teaching, (4) The historical context and the rabbis involved, (5) Different commentaries and interpretations, (6) How this teaching applies to modern life, (7) Related teachings from other parts of the Talmud.');
+            } else if (course === 'mishnah') {
+                window.askRabbi('Please teach me a Mishnah. Include: (1) The tractate and chapter, (2) The Hebrew text, (3) A clear translation, (4) Who taught this Mishnah (which Tanna), (5) The historical and agricultural/social context, (6) Key commentaries (Rambam, Bartenura, Tosafot Yom Tov), (7) How this Mishnah relates to practical halacha today, (8) Connections to other Mishnayot.');
+            } else if (course === 'mishnahTorah') {
+                window.askRabbi('Please teach me from the Rambam\'s Mishneh Torah. Include: (1) The specific book and chapter, (2) The halacha being discussed, (3) The Rambam\'s original Hebrew text, (4) His sources from the Talmud, (5) How he derived this ruling, (6) Disagreements from other Rishonim (Raavad, Ramban), (7) How the Shulchan Aruch rules on this matter, (8) Practical application today, (9) The Rambam\'s unique approach and philosophy.');
+            } else if (course === 'chesed') {
+                window.askRabbi('Please teach me about the mitzvah of Chesed (loving kindness). Include: (1) Torah sources for chesed, (2) The different types of chesed (visiting sick, hospitality, charity, comforting mourners, helping with weddings/funerals), (3) Stories of chesed from the Talmud and Midrash, (4) The laws and priorities of chesed, (5) How Avraham Avinu exemplified chesed, (6) Teachings from Chofetz Chaim\'s Ahavat Chesed, (7) Practical ways to increase chesed in daily life, (8) The spiritual rewards of chesed.');
+            } else if (course === 'mussar') {
+                window.askRabbi('Please teach me a Mussar teaching on character development. Include: (1) A specific middah (character trait) to work on, (2) Sources from Chovot HaLevavot, Mesillat Yesharim, or Orchot Tzaddikim, (3) Practical exercises to improve this trait, (4) Stories of great tzaddikim who exemplified this middah, (5) The Mussar movement\'s approach (R\' Yisrael Salanter), (6) Daily practices for self-improvement, (7) How to do a cheshbon hanefesh (spiritual accounting), (8) The connection between middot and serving Hashem.');
+            } else if (course === 'halacha') {
+                window.askRabbi('Please teach me a practical halacha. Include: (1) The topic and why it\'s relevant, (2) Sources from the Shulchan Aruch, (3) The Mishnah Berurah\'s rulings, (4) Sephardic rulings from the Ben Ish Chai or Yalkut Yosef, (5) Different customs (Ashkenaz, Sefard, Chassidish), (6) Modern poskim\'s opinions (Rav Moshe Feinstein, Rav Ovadia Yosef), (7) Common mistakes people make, (8) Practical tips for observance, (9) The reasons behind the halacha.');
+            } else if (course === 'chassidus') {
+                window.askRabbi('Please teach me a Chassidic teaching. Include: (1) A teaching from the Baal Shem Tov, Maggid of Mezritch, or a great Rebbe, (2) The original Hebrew/Yiddish text if available, (3) Deep explanation of the spiritual concepts, (4) How this connects to the weekly parsha or Jewish calendar, (5) Stories that illustrate this teaching, (6) Practical application for avodas Hashem (serving God), (7) The concept of devekut (cleaving to Hashem), (8) How this teaching can bring simcha (joy) to our service.');
+            } else if (course === 'kabbalah') {
+                window.askRabbi('Please teach me an introductory Kabbalah concept. Include: (1) A concept from the Zohar, Tanya, or other kabbalistic works, (2) Explanation appropriate for beginners, (3) How this concept relates to prayer and mitzvot, (4) The ten sefirot and how they apply, (5) The concept of tikkun (rectification), (6) How learning Kabbalah should lead to better mitzvah observance, (7) Warnings about proper approach to Kabbalah study, (8) Recommended texts for further learning.');
+            } else if (course === 'tehillim') {
+                window.askRabbi('Please teach me a chapter of Tehillim (Psalms). Include: (1) The full Hebrew text, (2) A beautiful translation, (3) Who wrote this psalm (David HaMelech, Asaf, etc.) and the circumstances, (4) Commentary from Rashi and Metzudat David, (5) Chassidic interpretations, (6) When this psalm is traditionally recited, (7) The spiritual power of saying Tehillim, (8) How to use this psalm in prayer and times of need, (9) Key verses to memorize.');
+            } else if (course === 'pirkeiAvot') {
+                window.askRabbi('Please teach me a Mishnah from Pirkei Avot (Ethics of the Fathers). Include: (1) The Hebrew text, (2) Which sage taught this and his background, (3) Multiple interpretations from classical commentaries (Rambam, Rabbeinu Yonah, Bartenura), (4) Stories about this sage, (5) How this teaching applies to relationships, work, and spiritual life, (6) Practical exercises based on this teaching, (7) Connections to other teachings in Pirkei Avot, (8) How to implement this wisdom today.');
             }
         };
         
@@ -4998,6 +5093,19 @@
             window.stopAllYiddishSpeech();
             
             var text = word.transliteration + '. ' + word.meaning;
+            
+            // Check voice mode - if fast, use browser TTS
+            if (window.rabbiVoiceMode === 'fast') {
+                if ('speechSynthesis' in window) {
+                    var utterance = new SpeechSynthesisUtterance(text);
+                    utterance.rate = window.yiddishSpeechRate;
+                    utterance.pitch = 0.9;
+                    utterance.lang = 'en-US';
+                    window.currentYiddishUtterance = utterance;
+                    speechSynthesis.speak(utterance);
+                }
+                return;
+            }
             
             // Use Gemini 2.5 Flash TTS for human voice
             try {
@@ -5570,6 +5678,41 @@
             rate: 1.0
         };
         
+        // Voice mode: 'human' (Gemini TTS) or 'fast' (Browser TTS)
+        window.rabbiVoiceMode = localStorage.getItem('rabbiVoiceMode') || 'human';
+        
+        window.setVoiceMode = function(mode) {
+            window.rabbiVoiceMode = mode;
+            localStorage.setItem('rabbiVoiceMode', mode);
+            
+            // Update all button states (main player and Yiddish panel)
+            document.querySelectorAll('.voice-toggle-btn, .yiddish-voice-btn').forEach(function(btn) {
+                btn.classList.remove('active');
+            });
+            
+            // Set active on matching buttons
+            document.querySelectorAll('.voice-toggle-btn[onclick*="' + mode + '"], .yiddish-voice-btn[onclick*="' + mode + '"]').forEach(function(btn) {
+                btn.classList.add('active');
+            });
+            
+            // Also update by ID for Yiddish panel
+            var humanBtn = document.getElementById('yiddishVoiceHuman');
+            var fastBtn = document.getElementById('yiddishVoiceFast');
+            if (humanBtn) humanBtn.classList.toggle('active', mode === 'human');
+            if (fastBtn) fastBtn.classList.toggle('active', mode === 'fast');
+            
+            console.log('Voice mode set to:', mode);
+        };
+        
+        // Initialize voice button states on page load
+        setTimeout(function() {
+            var mode = window.rabbiVoiceMode || 'human';
+            var humanBtn = document.getElementById('yiddishVoiceHuman');
+            var fastBtn = document.getElementById('yiddishVoiceFast');
+            if (humanBtn) humanBtn.classList.toggle('active', mode === 'human');
+            if (fastBtn) fastBtn.classList.toggle('active', mode === 'fast');
+        }, 100);
+        
         // Split text into chunks for TTS
         function splitTextIntoChunks(text, maxLength) {
             maxLength = maxLength || 300;
@@ -5597,6 +5740,7 @@
             hideAudioPlayer();
             
             var state = window.rabbiSpeechState;
+            var voiceMode = window.rabbiVoiceMode || 'human';
             var playerHtml = '<div id="rabbiAudioPlayer" class="rabbi-audio-player">' +
                 '<div class="rabbi-player-controls">' +
                     '<button class="rabbi-player-btn" onclick="window.skipBackward()" title="Previous">⏮️</button>' +
@@ -5612,6 +5756,11 @@
                     '<span>Speed:</span>' +
                     '<input type="range" id="speedSlider" min="0.5" max="2" step="0.1" value="' + state.rate + '" oninput="window.changeSpeed(this.value)">' +
                     '<span id="speedValue">' + state.rate.toFixed(1) + 'x</span>' +
+                '</div>' +
+                '<div class="rabbi-voice-toggle">' +
+                    '<span>Voice:</span>' +
+                    '<button class="voice-toggle-btn ' + (voiceMode === 'human' ? 'active' : '') + '" onclick="window.setVoiceMode(\'human\')" title="Human-like voice (slower)">🎭 Human</button>' +
+                    '<button class="voice-toggle-btn ' + (voiceMode === 'fast' ? 'active' : '') + '" onclick="window.setVoiceMode(\'fast\')" title="Fast browser voice">⚡ Fast</button>' +
                 '</div>' +
             '</div>';
             
@@ -5731,7 +5880,14 @@
             var chunk = state.chunks[state.currentChunkIndex];
             updateProgress();
             
-            // Try Gemini TTS first
+            // Check voice mode
+            if (window.rabbiVoiceMode === 'fast') {
+                // Use browser TTS directly (fast)
+                useBrowserTTSForChunk(chunk);
+                return;
+            }
+            
+            // Try Gemini TTS for human voice
             var ttsResult = await fetchGeminiTTS(chunk);
             
             if (ttsResult && ttsResult.audio) {
