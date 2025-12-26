@@ -1164,13 +1164,14 @@
         .rabbi-courses {
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 8px 12px;
+            gap: 5px;
+            padding: 6px 10px;
             background: linear-gradient(135deg, #1a365d 0%, #2d4a7c 100%);
             border-bottom: 2px solid rgba(184, 134, 11, 0.5);
             overflow-x: auto;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             -webkit-overflow-scrolling: touch;
+            max-height: 80px;
         }
         
         .rabbi-courses::-webkit-scrollbar {
@@ -1183,18 +1184,18 @@
         }
         
         .rabbi-courses-label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #FFD700;
             font-weight: bold;
             flex-shrink: 0;
         }
         
         .rabbi-course-btn {
-            padding: 6px 10px;
-            border: 2px solid #FFD700;
+            padding: 4px 8px;
+            border: 1px solid #FFD700;
             background: linear-gradient(135deg, rgba(184, 134, 11, 0.2) 0%, rgba(218, 165, 32, 0.3) 100%);
-            border-radius: 15px;
-            font-size: 0.7rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
             cursor: pointer;
             transition: all 0.3s;
             color: white;
@@ -1205,7 +1206,7 @@
         
         .rabbi-course-btn:hover {
             background: linear-gradient(135deg, #B8860B 0%, #DAA520 100%);
-            transform: translateY(-2px);
+            transform: translateY(-1px);
             box-shadow: 0 4px 15px rgba(184, 134, 11, 0.4);
         }
         
@@ -4539,10 +4540,10 @@
             
             <!-- Suggested Prompts -->
             <div class="rabbi-suggestions" id="rabbiSuggestions">
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What does the Torah teach about finding purpose in retirement?')">🎯 Purpose in Retirement</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('How can I start studying Torah as a beginner?')">📖 Torah Study</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What chesed projects are meaningful for someone my age?')">💝 Chesed Ideas</button>
-                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('Tell me a story of wisdom from the Talmud')">📜 Talmud Story</button>
+                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What does the Torah teach about finding purpose in retirement?')">🎯 Purpose</button>
+                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('How can I start studying Torah as a beginner?')">📚 Beginner</button>
+                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('What chesed projects are meaningful for someone my age?')">❤️ Chesed Ideas</button>
+                <button class="rabbi-suggestion-btn" onclick="window.askRabbi('Tell me a story of wisdom from the Talmud')">📖 Story</button>
             </div>
             
             <div class="rabbi-messages font-medium" id="rabbiMessages">
